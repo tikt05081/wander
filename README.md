@@ -18,5 +18,5 @@ then open http://localhost:8080
 Static site — no build. Push to GitHub, import into Vercel, done.
 
 ## Before going live
-- Replace `YOUR_FORM_ID` in `index.html` with a real Formspree form id (free tier is fine)
+- Change `EMAIL` at the bottom of `index.html` to your real address
 - Replace `hello@example.com` with your email

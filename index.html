@@ -88,7 +88,7 @@
 
   <section id="how">
     <h2>How it works</h2>
-    <p class="sub">Every walkthrough is built and checked by a person — that's the point. You don't upload anything into a tool; you just send us the listing.</p>
+    <p class="sub">Every walkthrough is built and checked by a person — that's the point. You don't upload anything into a tool; you just send me the listing.</p>
     <div class="grid3">
       <div class="card"><div class="n">1</div><h3>Send us the listing</h3><p>Paste the Rightmove / Zoopla link, or email the floorplan and photos. That's the whole brief.</p></div>
       <div class="card"><div class="n">2</div><h3>We build it</h3><p>We model every room to the plan, place windows and doors, and match finishes to the photos. You get a private preview link to approve.</p></div>
@@ -98,45 +98,34 @@
 
   <section id="pricing">
     <h2>Pricing</h2>
-    <p class="sub">Per property. No subscription, no minimum. First walkthrough for any agency is on us — see for yourself if buyers use it.</p>
-    <div class="price">
-      <div class="card">
-        <div class="pill">Starter</div>
-        <div class="amt">£49<small> / property</small></div>
-        <ul><li>Up to 2 bedrooms / 6 rooms</li><li>Interactive 3D walkthrough link</li><li>48-hour turnaround</li><li>One round of changes</li></ul>
-        <a class="btn ghost" href="#request">Request</a>
-      </div>
+    <p class="sub">One flat price per property. No subscription, no minimum. Your first walkthrough is free — see for yourself whether buyers use it before you pay a penny.</p>
+    <div class="price" style="grid-template-columns:1fr 1fr;max-width:720px">
       <div class="card hot">
-        <div class="pill">Standard</div>
-        <div class="amt">£89<small> / property</small></div>
-        <ul><li>Up to 4 bedrooms / 10 rooms</li><li>Finishes matched to photos</li><li>Room labels &amp; jump-to-room</li><li>Embed code for your website</li><li>Two rounds of changes</li></ul>
-        <a class="btn" href="#request">Request</a>
+        <div class="pill">Per property</div>
+        <div class="amt">£89<small> one-off</small></div>
+        <ul><li>Full interactive 3D walkthrough of the home</li><li>Every room modelled to the floorplan</li><li>Finishes matched to the listing photos</li><li>One link that works on any phone or laptop</li><li>48-hour turnaround · two rounds of changes</li></ul>
+        <a class="btn" href="#request">Request one</a>
       </div>
       <div class="card">
         <div class="pill">Premium</div>
-        <div class="amt">£149<small> / property</small></div>
-        <ul><li>Large / multi-floor homes</li><li>Basic furniture staging</li><li>Branded with your agency logo</li><li>24-hour turnaround</li><li>Unlimited changes</li></ul>
-        <a class="btn ghost" href="#request">Request</a>
+        <div class="amt">£149<small> one-off</small></div>
+        <ul><li>Everything in the standard walkthrough</li><li>Large or multi-floor homes</li><li>Basic furniture staging</li><li>Your agency logo on the walkthrough</li><li>24-hour turnaround · unlimited changes</li></ul>
+        <a class="btn ghost" href="#request">Request one</a>
       </div>
     </div>
-    <p class="note" style="margin-top:14px">Agencies listing 10+ properties a month: ask about a flat monthly rate.</p>
+    <p class="note" style="margin-top:14px">Listing 10+ properties a month? Ask about a monthly rate.</p>
   </section>
 
   <section id="request">
     <h2>Request a walkthrough</h2>
-    <p class="sub">We reply personally, usually within a few hours. Nothing is charged until you've approved the preview.</p>
-    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-      <label>Your name<input name="name" required></label>
-      <label>Email<input name="email" type="email" required></label>
-      <label>Agency (or "private seller")<input name="agency"></label>
-      <label>Phone / WhatsApp (optional)<input name="phone"></label>
-      <label class="full">Listing link (Rightmove, Zoopla, OnTheMarket…)<input name="listing" placeholder="https://www.rightmove.co.uk/properties/…"></label>
-      <label class="full">Anything else?<textarea name="notes" placeholder="Number of floors, deadline, which package you're interested in…"></textarea></label>
-      <div class="full" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <button class="btn" type="submit">Send request</button>
-        <span class="note">Or just email <a href="mailto:hello@example.com">hello@example.com</a></span>
+    <p class="sub">Email me the listing link — that's the whole brief. I reply personally, usually within a few hours, and nothing is charged until you've approved the preview.</p>
+    <div class="card" style="max-width:720px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-size:15px;color:var(--muted)">Include: the Rightmove / Zoopla link (or the floorplan + photos), and any deadline.</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <a class="btn" id="mailBtn" href="#">Email the listing →</a>
+        <span class="note">or write to <a id="mailTxt" href="#"></a></span>
       </div>
-    </form>
+    </div>
   </section>
 
   <footer>
@@ -144,5 +133,14 @@
     <div>Walk through it before you view it.</div>
   </footer>
 </div>
+<script>
+  // ── Change your email here (one place) ──
+  const EMAIL = "hello@example.com";
+  const subj = encodeURIComponent("Walkthrough request");
+  const body = encodeURIComponent("Hi,\n\nListing link: \nAgency: \nDeadline (if any): \n\nThanks");
+  document.getElementById('mailBtn').href = `mailto:${EMAIL}?subject=${subj}&body=${body}`;
+  document.getElementById('mailTxt').href = `mailto:${EMAIL}`;
+  document.getElementById('mailTxt').textContent = EMAIL;
+</script>
 </body>
 </html>
