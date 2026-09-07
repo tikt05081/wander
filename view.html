@@ -54,7 +54,7 @@
   <div id="load">Building the house…</div>
 </div>
 <script type="module">
-import { createViewer } from './lib/wander-engine.js';
+import { createViewer } from './lib/wander-engine.js?v=654c357';
 const q = new URLSearchParams(location.search);
 const src = q.get('p') ? `projects/${q.get('p')}.json` : null;
 const overlay = document.getElementById('overlay');
@@ -78,7 +78,7 @@ document.getElementById('bNext').onclick=()=>goRoom(curRoom+1);
 document.getElementById('bDoll').onclick=()=>toggleDoll();
 document.getElementById('bFull').onclick=()=>{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
 // room thumbnails: quick offscreen snapshots from each room centre after first paint
-setTimeout(()=>{ const savedP=v.camera.position.clone(), savedR=v.camera.rotation.clone(); project.rooms.forEach((r,i)=>{ v.teleport(built.roomCentres[i]); v.camera.rotation.set(-0.05, (built.orient[i]||{back:0}).back*Math.PI/2 + Math.PI, 0); roomBtns[i].style.backgroundImage=`url(${v.thumb()})`; }); v.camera.position.copy(savedP); v.camera.rotation.copy(savedR); }, 400);
+if (!q.get('still')) setTimeout(()=>{ const savedP=v.camera.position.clone(), savedR=v.camera.rotation.clone(); project.rooms.forEach((r,i)=>{ v.teleport(built.roomCentres[i]); v.camera.rotation.set(-0.05, (built.orient[i]||{back:0}).back*Math.PI/2 + Math.PI, 0); roomBtns[i].style.backgroundImage=`url(${v.thumb()})`; }); v.camera.position.copy(savedP); v.camera.rotation.copy(savedR); }, 400);
 document.getElementById('load').remove();
 // mini-map: rooms drawn to scale, camera dot + heading
 { const mc=document.getElementById('mapc'), g=mc.getContext('2d'); const rw=project.rooms.map(r=>r.pts.map(p=>({x:p.x*iw*(+project.scale/iw), z:p.y*ih*(+project.scale/iw)})));
