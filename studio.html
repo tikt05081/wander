@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wander Studio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --bg:#0f1115; --panel:#181b22; --line:#2a2f3a; --text:#e8eaf0; --muted:#8b92a5; --accent:#6c8cff; --ok:#3ddc84; --warn:#ffb648; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  header { display:flex; align-items:center; gap:14px; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:16px; margin:0; font-weight:600; letter-spacing:.3px; }
+  header h1 span { color:var(--accent); }
+  header .tabs { margin-left:auto; display:flex; gap:6px; }
+  .tab { padding:7px 14px; border-radius:8px; background:transparent; color:var(--muted); border:1px solid transparent; cursor:pointer; font-size:13px; }
+  .tab.active { background:#232838; color:var(--text); border-color:var(--line); }
+  main { flex:1; display:flex; min-height:0; }
+  aside { width:300px; border-right:1px solid var(--line); background:var(--panel); padding:14px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:12px; background:#1c2029; }
+  .card h3 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); }
+  .card p { margin:0; font-size:13px; color:var(--muted); line-height:1.45; }
+  button, label.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:#232838; color:var(--text); cursor:pointer; font-size:13px; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  button.danger { color:#ff7b7b; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  input[type=file] { display:none; }
+  input[type=text], input[type=number], select { width:100%; padding:7px 9px; border-radius:7px; border:1px solid var(--line); background:#12151c; color:var(--text); font-size:13px; }
+  .field { display:flex; flex-direction:column; gap:4px; margin-top:8px; font-size:12px; color:var(--muted); }
+  #stage { flex:1; position:relative; background:#0b0d12; }
+  canvas#plan { position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; }
+  #three { position:absolute; inset:0; width:100%; height:100%; display:none; }
+  #hint { position:absolute; left:14px; bottom:14px; background:rgba(15,17,21,.85); border:1px solid var(--line); padding:8px 12px; border-radius:8px; font-size:12px; color:var(--muted); pointer-events:none; }
+  #overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); cursor:pointer; }
+  #overlay div { text-align:center; }
+  #overlay h2 { margin:0 0 6px; font-size:22px; }
+  #overlay p { color:var(--muted); margin:0; font-size:14px; }
+  ul.rooms { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
+  ul.rooms li { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 8px; border-radius:7px; background:#12151c; border:1px solid transparent; }
+  ul.rooms li.sel { border-color:var(--accent); }
+  ul.rooms li .sw { width:12px; height:12px; border-radius:3px; }
+  ul.rooms li .nm { flex:1; cursor:pointer; }
+  ul.rooms li .x { color:#ff7b7b; cursor:pointer; padding:0 4px; }
+  ul.rooms li .ph { font-size:11px; color:var(--muted); }
+  .badge { font-size:11px; padding:2px 7px; border-radius:99px; background:#232838; color:var(--muted); }
+  .badge.ok { color:var(--ok); }
+  .photos { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:8px; }
+  .photos img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:6px; border:2px solid transparent; cursor:pointer; }
+  .photos img.sel { border-color:var(--accent); }
+  .kbd { display:inline-block; padding:1px 6px; border:1px solid var(--line); border-radius:4px; font-size:11px; background:#12151c; }
+  #brand { position:absolute; right:14px; bottom:14px; font-size:11px; color:var(--muted); letter-spacing:1px; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>Wander</span> <small style="color:var(--muted);font-weight:400">studio</small></h1>
+  <a href="./" style="color:var(--muted);font-size:13px;text-decoration:none;margin-left:6px">← site</a>
+  <div class="tabs">
+    <button class="tab active" id="tabPlan">1 · Trace plan</button>
+    <button class="tab" id="tabWalk">2 · Walk through</button>
+  </div>
+</header>
+<main>
+  <aside id="side">
+    <div class="card">
+      <h3>Floorplan</h3>
+      <div class="row">
+        <label class="btn" for="planFile">Upload floorplan</label>
+        <input type="file" id="planFile" accept="image/*">
+        <button id="sampleBtn">Use sample</button>
+      </div>
+      <div class="field">Scale — real width of the whole plan image (metres)
+        <input type="number" id="scaleM" value="12" step="0.5" min="2">
+      </div>
+      <div class="field">Wall height (m) <input type="number" id="wallH" value="2.5" step="0.1" min="2"></div>
+    </div>
+
+    <div class="card">
+      <h3>Rooms <span class="badge" id="roomCount">0</span></h3>
+      <p>Click the corners of a room on the plan, then <span class="kbd">Enter</span> or double-click to close it. <span class="kbd">Esc</span> cancels, <span class="kbd">Backspace</span> undoes a point.</p>
+      <div class="row" style="margin-top:8px">
+        <button id="newRoom" class="primary">+ New room</button>
+        <button id="clearAll" class="danger">Clear</button>
+      </div>
+      <ul class="rooms" id="roomList" style="margin-top:10px"></ul>
+    </div>
+
+    <div class="card" id="photoCard">
+      <h3>Listing photos</h3>
+      <p>Upload the listing photos, then select a room above and click a photo to hang it on that room's walls.</p>
+      <div class="row" style="margin-top:8px">
+        <label class="btn" for="photoFiles">Upload photos</label>
+        <input type="file" id="photoFiles" accept="image/*" multiple>
+      </div>
+      <div class="photos" id="photoGrid"></div>
+    </div>
+
+    <div class="card">
+      <h3>Build</h3>
+      <button id="buildBtn" class="primary" style="width:100%" disabled>Build 3D walkthrough →</button>
+      <p style="margin-top:8px">Then click the view to lock the mouse. <span class="kbd">W A S D</span> move · mouse look · <span class="kbd">Shift</span> run · <span class="kbd">Esc</span> release.</p>
+      <div class="row" style="margin-top:8px">
+        <button id="saveBtn">Save project</button>
+        <label class="btn" for="loadFile">Load</label>
+        <input type="file" id="loadFile" accept=".json">
+      </div>
+    </div>
+  </aside>
+
+  <div id="stage">
+    <canvas id="plan"></canvas>
+    <canvas id="three"></canvas>
+    <div id="overlay"><div><h2>Click to enter</h2><p>WASD to walk · mouse to look · Esc to exit</p></div></div>
+    <div id="hint">Upload a floorplan, or try the sample.</div>
+    <div id="teleport" style="position:absolute;top:14px;left:14px;display:none;gap:6px;flex-wrap:wrap;max-width:70%"></div>
+    <div id="brand">WANDER · STUDIO</div>
+  </div>
+</main>
+
+<script type="module">
+import * as THREE from './lib/three.module.js';
+import { PointerLockControls } from './lib/PointerLockControls.js';
+
+/* ------------------------------------------------------------------ state */
+const state = {
+  planImg: null,          // HTMLImageElement
+  planDataURL: null,
+  rooms: [],              // {name, pts:[{x,y} normalised 0..1], color, photo:index|null}
+  photos: [],             // dataURLs
+  drawing: null,          // current pts while drawing
+  selRoom: -1,
+  selPhoto: -1,
+  mode: 'plan',
+};
+const PALETTE = ['#6c8cff','#3ddc84','#ffb648','#ff7b7b','#c78bff','#4fd1e0','#f28cd0','#a7e34d'];
+const $ = id => document.getElementById(id);
+const planCv = $('plan'), ctx = planCv.getContext('2d');
+const hint = $('hint');
+
+/* ------------------------------------------------------------------ plan canvas */
+let view = { ox:0, oy:0, s:1 };   // image draw offset & scale to fit canvas
+function resizePlan() {
+  const r = planCv.parentElement.getBoundingClientRect();
+  planCv.width = r.width * devicePixelRatio; planCv.height = r.height * devicePixelRatio;
+  planCv.style.width = r.width+'px'; planCv.style.height = r.height+'px';
+  fitImage(); drawPlan();
+}
+function fitImage() {
+  if (!state.planImg) return;
+  const W = planCv.width, H = planCv.height, iw = state.planImg.width, ih = state.planImg.height;
+  view.s = Math.min(W/iw, H/ih) * 0.94;
+  view.ox = (W - iw*view.s)/2; view.oy = (H - ih*view.s)/2;
+}
+const toImg = (cx, cy) => ({ x:(cx*devicePixelRatio - view.ox)/(view.s*state.planImg.width), y:(cy*devicePixelRatio - view.oy)/(view.s*state.planImg.height) });
+const toCv  = p => ({ x: view.ox + p.x*state.planImg.width*view.s, y: view.oy + p.y*state.planImg.height*view.s });
+
+function drawPlan() {
+  ctx.clearRect(0,0,planCv.width,planCv.height);
+  if (!state.planImg) return;
+  ctx.drawImage(state.planImg, view.ox, view.oy, state.planImg.width*view.s, state.planImg.height*view.s);
+  ctx.lineWidth = 3*devicePixelRatio;
+  state.rooms.forEach((r,i) => {
+    ctx.beginPath(); r.pts.forEach((p,j)=>{ const c=toCv(p); j?ctx.lineTo(c.x,c.y):ctx.moveTo(c.x,c.y); }); ctx.closePath();
+    ctx.fillStyle = r.color + (i===state.selRoom?'66':'33'); ctx.fill();
+    ctx.strokeStyle = r.color; ctx.stroke();
+    const c = centroid(r.pts.map(toCv));
+    ctx.fillStyle='#fff'; ctx.font=`${13*devicePixelRatio}px sans-serif`; ctx.textAlign='center';
+    ctx.fillText(r.name + (r.photo!=null?' 📷':''), c.x, c.y);
+  });
+  if (state.drawing) {
+    ctx.beginPath(); state.drawing.forEach((p,j)=>{ const c=toCv(p); j?ctx.lineTo(c.x,c.y):ctx.moveTo(c.x,c.y); });
+    ctx.strokeStyle='#fff'; ctx.setLineDash([8,6]); ctx.stroke(); ctx.setLineDash([]);
+    state.drawing.forEach(p=>{ const c=toCv(p); ctx.beginPath(); ctx.arc(c.x,c.y,5*devicePixelRatio,0,7); ctx.fillStyle='#fff'; ctx.fill(); });
+  }
+}
+function centroid(pts){ let x=0,y=0; pts.forEach(p=>{x+=p.x;y+=p.y}); return {x:x/pts.length,y:y/pts.length}; }
+
+/* ------------------------------------------------------------------ input on plan */
+planCv.addEventListener('click', e => {
+  if (!state.planImg) return;
+  const r = planCv.getBoundingClientRect(); const p = toImg(e.clientX-r.left, e.clientY-r.top);
+  if (state.drawing) {
+    // snap to existing corners for clean shared walls
+    const snap = nearestCorner(p, 0.012); state.drawing.push(snap||p); drawPlan();
+    hint.textContent = `${state.drawing.length} point(s). Enter / double-click to close room.`;
+  } else {
+    // select room under cursor
+    state.selRoom = state.rooms.findIndex(rm => inPoly(p, rm.pts)); renderRooms(); drawPlan();
+  }
+});
+planCv.addEventListener('dblclick', e => { e.preventDefault(); if (state.drawing) { if (state.drawing.length>3) state.drawing.pop(); finishRoom(); } });
+window.addEventListener('keydown', e => {
+  if (state.mode!=='plan') return;
+  if (e.key==='Enter' && state.drawing) finishRoom();
+  if (e.key==='Escape' && state.drawing) { state.drawing=null; drawPlan(); hint.textContent='Cancelled.'; }
+  if (e.key==='Backspace' && state.drawing) { state.drawing.pop(); drawPlan(); }
+});
+function nearestCorner(p, tol){ let best=null,bd=tol; for(const r of state.rooms) for(const q of r.pts){ const d=Math.hypot(q.x-p.x,q.y-p.y); if(d<bd){bd=d;best=q;} } return best?{...best}:null; }
+function inPoly(p, poly){ let c=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const a=poly[i],b=poly[j]; if(((a.y>p.y)!==(b.y>p.y)) && (p.x < (b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)) c=!c; } return c; }
+
+$('newRoom').onclick = () => { if(!state.planImg) return; state.drawing=[]; hint.textContent='Click the room corners…'; };
+function finishRoom(){
+  if (!state.drawing || state.drawing.length<3) { hint.textContent='Need at least 3 points.'; return; }
+  const name = prompt('Room name?', ['Living room','Kitchen','Bedroom','Bathroom','Hall'][state.rooms.length%5]) || `Room ${state.rooms.length+1}`;
+  state.rooms.push({ name, pts: state.drawing, color: PALETTE[state.rooms.length%PALETTE.length], photo:null });
+  state.drawing=null; state.selRoom=state.rooms.length-1; renderRooms(); drawPlan(); updateBuild();
+  hint.textContent = `Added ${name}. Add another room, or Build.`;
+}
+$('clearAll').onclick = () => { if(confirm('Remove all rooms?')){ state.rooms=[]; state.selRoom=-1; renderRooms(); drawPlan(); updateBuild(); } };
+
+function renderRooms(){
+  const ul=$('roomList'); ul.innerHTML='';
+  state.rooms.forEach((r,i)=>{
+    const li=document.createElement('li'); if(i===state.selRoom) li.classList.add('sel');
+    li.innerHTML=`<span class="sw" style="background:${r.color}"></span><span class="nm">${r.name}</span><span class="ph">${r.photo!=null?'photo '+(r.photo+1):'no photo'}</span><span class="x">✕</span>`;
+    li.querySelector('.nm').onclick=()=>{ state.selRoom=i; renderRooms(); drawPlan(); };
+    li.querySelector('.nm').ondblclick=()=>{ const n=prompt('Rename room', r.name); if(n){r.name=n; renderRooms(); drawPlan();} };
+    li.querySelector('.x').onclick=()=>{ state.rooms.splice(i,1); state.selRoom=-1; renderRooms(); drawPlan(); updateBuild(); };
+    ul.appendChild(li);
+  });
+  $('roomCount').textContent=state.rooms.length;
+}
+function updateBuild(){ $('buildBtn').disabled = state.rooms.length===0; }
+
+/* ------------------------------------------------------------------ files */
+$('planFile').onchange = e => { const f=e.target.files[0]; if(f) readImg(f, url=>setPlan(url)); };
+function readImg(file, cb){ const r=new FileReader(); r.onload=()=>cb(r.result); r.readAsDataURL(file); }
+function setPlan(url, after){ const im=new Image(); im.onload=()=>{ state.planImg=im; state.planDataURL=url; state.rooms=[]; state.selRoom=-1; if(after) after(); renderRooms(); fitImage(); drawPlan(); updateBuild(); if(!after) hint.textContent='Set the scale on the left, then + New room and click corners.'; }; im.src=url; }
+
+$('photoFiles').onchange = e => { [...e.target.files].forEach(f=>readImg(f,url=>{ state.photos.push(url); renderPhotos(); })); };
+function renderPhotos(){
+  const g=$('photoGrid'); g.innerHTML='';
+  state.photos.forEach((u,i)=>{ const im=document.createElement('img'); im.src=u; if(i===state.selPhoto) im.classList.add('sel');
+    im.onclick=()=>{ if(state.selRoom<0){ hint.textContent='Select a room first, then click a photo.'; return; } state.rooms[state.selRoom].photo=i; state.selPhoto=i; renderPhotos(); renderRooms(); drawPlan(); hint.textContent=`Photo ${i+1} → ${state.rooms[state.selRoom].name}`; };
+    g.appendChild(im); });
+}
+
+/* sample floorplan drawn procedurally so the demo works with zero uploads */
+$('sampleBtn').onclick = () => {
+  const c=document.createElement('canvas'); c.width=1200; c.height=800; const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.fillRect(0,0,1200,800); g.strokeStyle='#222'; g.lineWidth=10;
+  const R=[[60,60,560,440,'LIVING ROOM'],[620,60,520,300,'KITCHEN'],[620,360,520,380,'BEDROOM 1'],[60,500,330,240,'BEDROOM 2'],[390,500,230,240,'BATH']];
+  R.forEach(([x,y,w,h,n])=>{ g.strokeRect(x,y,w,h); g.fillStyle='#333'; g.font='bold 26px sans-serif'; g.textAlign='center'; g.fillText(n,x+w/2,y+h/2); });
+  g.fillStyle='#fff'; [[340,500,80,12],[620,200,12,80],[620,560,12,80],[480,500,80,12]].forEach(([x,y,w,h])=>g.fillRect(x-2,y-3,w+4,h+6));
+  g.fillStyle='#999'; g.font='18px sans-serif'; g.textAlign='left'; g.fillText('SAMPLE PLAN · approx 12 m × 8 m',60,780);
+  $('scaleM').value=12;
+  const N=(x,y)=>({x:x/1200,y:y/800});
+  setPlan(c.toDataURL(), ()=>{   // pre-trace it so you can hit Build immediately
+    state.rooms = R.map(([x,y,w,h,n],i)=>({ name:n.replace(/\b\w+/g,s=>s[0]+s.slice(1).toLowerCase()), color:PALETTE[i], photo:null, pts:[N(x,y),N(x+w,y),N(x+w,y+h),N(x,y+h)] }));
+    hint.textContent='Sample loaded and pre-traced. Hit Build, or add/remove rooms.';
+  });
+};
+
+/* save / load */
+$('saveBtn').onclick=()=>{ const blob=new Blob([JSON.stringify({plan:state.planDataURL,rooms:state.rooms,photos:state.photos,scale:$('scaleM').value,wallH:$('wallH').value})],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='wander-project.json'; a.click(); };
+$('loadFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ const d=JSON.parse(r.result); state.photos=d.photos||[]; $('scaleM').value=d.scale||12; $('wallH').value=d.wallH||2.5; const im=new Image(); im.onload=()=>{ state.planImg=im; state.planDataURL=d.plan; state.rooms=d.rooms||[]; renderRooms(); renderPhotos(); fitImage(); drawPlan(); updateBuild(); }; im.src=d.plan; }; r.readAsText(f); };
+
+/* ------------------------------------------------------------------ 3D */
+let renderer, scene, camera, controls, clock, colliders=[], keys={};
+const threeCv=$('three'), overlay=$('overlay');
+
+function buildScene(){
+  const scaleM = parseFloat($('scaleM').value)||12, H=parseFloat($('wallH').value)||2.5;
+  const iw=state.planImg.width, ih=state.planImg.height, mpp=scaleM/iw;   // metres per image pixel
+  const toW = p => ({ x:p.x*iw*mpp, z:p.y*ih*mpp });                           // normalised → metres
+  const depthM = ih*mpp;
+
+  if (!renderer) {
+    renderer=new THREE.WebGLRenderer({canvas:threeCv,antialias:true}); renderer.setPixelRatio(devicePixelRatio); renderer.shadowMap.enabled=true;
+    camera=new THREE.PerspectiveCamera(70,1,0.05,200);
+    controls=new PointerLockControls(camera, threeCv);
+    controls.addEventListener('lock',()=>overlay.style.display='none'); controls.addEventListener('unlock',()=>overlay.style.display='flex');
+    overlay.onclick=()=>controls.lock();
+    window.addEventListener('keydown',e=>keys[e.code]=true); window.addEventListener('keyup',e=>keys[e.code]=false);
+    clock=new THREE.Clock(); animate();
+  }
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0xdfe7f2); scene.fog=new THREE.Fog(0xdfe7f2,25,60);
+  colliders=[];
+
+  // lights
+  scene.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.4)); scene.add(new THREE.AmbientLight(0xffffff,0.35));
+  const sun=new THREE.DirectionalLight(0xffffff,1.1); sun.position.set(scaleM, 12, depthM*1.2); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+  const cam=sun.shadow.camera; cam.left=-scaleM; cam.right=scaleM*2; cam.top=depthM*2; cam.bottom=-depthM; scene.add(sun);
+
+  // ground / garden
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200), new THREE.MeshStandardMaterial({color:0x8fbf7a})); ground.rotation.x=-Math.PI/2; ground.position.y=-0.01; ground.receiveShadow=true; scene.add(ground);
+
+  const loader=new THREE.TextureLoader();
+  const floorMat=new THREE.MeshStandardMaterial({color:0xcbb08a, roughness:0.85});
+  const wallMatBase=new THREE.MeshStandardMaterial({color:0xf2f0ea, roughness:0.95});
+  const ceilMat=new THREE.MeshStandardMaterial({color:0xffffff, side:THREE.BackSide});
+
+  // shared-wall detection: any edge that appears in two rooms is interior; we cut a doorway in interior walls
+  const edgeKey=(a,b)=>{ const k1=`${a.x.toFixed(3)},${a.z.toFixed(3)}`, k2=`${b.x.toFixed(3)},${b.z.toFixed(3)}`; return k1<k2?k1+'|'+k2:k2+'|'+k1; };
+  const edgeCount={};
+  const roomEdges = state.rooms.map(r=>{ const w=r.pts.map(toW); const e=[]; for(let i=0;i<w.length;i++){ const a=w[i], b=w[(i+1)%w.length]; e.push([a,b]); edgeCount[edgeKey(a,b)]=(edgeCount[edgeKey(a,b)]||0)+1; } return e; });
+
+  state.rooms.forEach((room,ri)=>{
+    const w=room.pts.map(toW);
+    // floor + ceiling
+    const shape=new THREE.Shape(w.map(p=>new THREE.Vector2(p.x,p.z)));
+    const floor=new THREE.Mesh(new THREE.ShapeGeometry(shape), floorMat.clone()); floor.rotation.x=Math.PI/2; floor.receiveShadow=true; floor.material.side=THREE.DoubleSide; scene.add(floor);
+    const ceil=new THREE.Mesh(new THREE.ShapeGeometry(shape), ceilMat); ceil.rotation.x=Math.PI/2; ceil.position.y=H; ceil.material=new THREE.MeshStandardMaterial({color:0xffffff,side:THREE.DoubleSide,emissive:0x333333}); scene.add(ceil);
+    // label sprite
+    const c={x:w.reduce((a,p)=>a+p.x,0)/w.length, z:w.reduce((a,p)=>a+p.z,0)/w.length}; scene.add(makeLabel(room.name, c.x, H-0.3, c.z));
+    // photo texture for this room's walls
+    let wallMat=wallMatBase;
+    if (room.photo!=null) { const t=loader.load(state.photos[room.photo]); t.colorSpace=THREE.SRGBColorSpace; wallMat=new THREE.MeshStandardMaterial({map:t, roughness:0.9}); }
+    // walls
+    roomEdges[ri].forEach(([a,b])=>{
+      const interior = edgeCount[edgeKey(a,b)]>1;
+      // interior edge belongs to two rooms; only build once (from the room with lower index) to avoid z-fighting
+      if (interior && state.rooms.findIndex((_,j)=>roomEdges[j].some(([p,q])=>edgeKey(p,q)===edgeKey(a,b)))!==ri) return;
+      buildWall(a,b,H,wallMat,interior ? {door:true} : {window:true});
+    });
+  });
+
+  // camera start: centre of first room, eye height
+  const f0=state.rooms[0].pts.map(toW); const first={x:f0.reduce((a,p)=>a+p.x,0)/f0.length, z:f0.reduce((a,p)=>a+p.z,0)/f0.length}; camera.position.set(first.x,1.6,first.z); camera.lookAt(first.x+1,1.6,first.z);
+  const tp=$('teleport'); tp.innerHTML=''; state.rooms.forEach(r=>{ const w=r.pts.map(toW); const c={x:w.reduce((a,p)=>a+p.x,0)/w.length, z:w.reduce((a,p)=>a+p.z,0)/w.length}; const b=document.createElement('button'); b.textContent=r.name; b.style.cssText='background:rgba(24,27,34,.85);font-size:12px;padding:6px 10px'; b.onclick=()=>{ camera.position.set(c.x,1.6,c.z); }; tp.appendChild(b); });
+  resize3D();
+
+  function buildWall(a,b,H,mat,opts){
+    const len=Math.hypot(b.x-a.x,b.z-a.z); if(len<0.05) return;
+    const ang=Math.atan2(b.z-a.z,b.x-a.x), T=0.12;
+    const mid={x:(a.x+b.x)/2,z:(a.z+b.z)/2};
+    const segs=[];
+    if (opts.door && len>1.4) {            // doorway 0.9 m wide × 2.05 m tall in the middle
+      const dw=0.9, dh=2.05, side=(len-dw)/2;
+      segs.push({off:-len/2+side/2, w:side, y:H/2, h:H}); segs.push({off:len/2-side/2, w:side, y:H/2, h:H}); if(H-dh>0.02) segs.push({off:0, w:dw, y:dh+(H-dh)/2, h:H-dh, nocol:true});
+    } else if (opts.window && len>2.2) {   // window 1.2 m wide, sill 0.9 m, head 2.1 m
+      const ww=Math.min(1.4,len*0.4), sill=0.9, head=2.1, side=(len-ww)/2;
+      segs.push({off:-len/2+side/2, w:side, y:H/2, h:H}); segs.push({off:len/2-side/2, w:side, y:H/2, h:H});
+      segs.push({off:0,w:ww,y:sill/2,h:sill}); segs.push({off:0,w:ww,y:(H+head)/2,h:H-head});
+      const glass=new THREE.Mesh(new THREE.BoxGeometry(ww,head-sill,0.02), new THREE.MeshPhysicalMaterial({color:0xbfe3ff,transmission:0.9,transparent:true,opacity:0.5,roughness:0}));
+      glass.position.set(mid.x,(sill+head)/2,mid.z); glass.rotation.y=-ang; scene.add(glass);
+      segs.push({off:0,w:ww,y:(sill+head)/2,h:head-sill,nocol:false,invisible:true});
+    } else segs.push({off:0,w:len,y:H/2,h:H});
+    segs.forEach(s=>{
+      if (s.invisible){ pushCollider(mid,ang,s.off,s.w,T); return; }
+      const m=new THREE.Mesh(new THREE.BoxGeometry(s.w,s.h,T), mat); 
+      m.position.set(mid.x+Math.cos(ang)*s.off, s.y, mid.z+Math.sin(ang)*s.off); m.rotation.y=-ang; m.castShadow=true; m.receiveShadow=true; scene.add(m);
+      if(!s.nocol) pushCollider(mid,ang,s.off,s.w,T);
+    });
+  }
+  function pushCollider(mid,ang,off,w,T){ colliders.push({cx:mid.x+Math.cos(ang)*off, cz:mid.z+Math.sin(ang)*off, ang, hw:w/2, ht:T/2+0.25}); }
+}
+function makeLabel(text,x,y,z){ const c=document.createElement('canvas'); c.width=512; c.height=128; const g=c.getContext('2d'); g.fillStyle='rgba(20,22,30,0.7)'; g.roundRect(0,0,512,128,24); g.fill(); g.fillStyle='#fff'; g.font='bold 56px sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(text,256,64); const t=new THREE.CanvasTexture(c); const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,opacity:0.9})); s.scale.set(1.2,0.3,1); s.position.set(x,y,z); return s; }
+
+function collide(pos){ // push the player out of any wall's oriented box
+  for(const c of colliders){ const dx=pos.x-c.cx, dz=pos.z-c.cz; const cos=Math.cos(c.ang), sin=Math.sin(c.ang);
+    const lx=dx*cos+dz*sin, lz=-dx*sin+dz*cos; if(Math.abs(lx)<c.hw && Math.abs(lz)<c.ht){ const push=(c.ht-Math.abs(lz))*Math.sign(lz||1); pos.x+=-push*sin; pos.z+=push*cos; } }
+}
+function animate(){ requestAnimationFrame(animate); if(!scene) return; const dt=Math.min(clock.getDelta(),0.05);
+  if(controls.isLocked){ const sp=(keys.ShiftLeft||keys.ShiftRight?4.5:2.2)*dt; const dir=new THREE.Vector3(); camera.getWorldDirection(dir); dir.y=0; dir.normalize(); const right=new THREE.Vector3().crossVectors(dir,new THREE.Vector3(0,1,0));
+    const p=camera.position; if(keys.KeyW||keys.ArrowUp) p.addScaledVector(dir,sp); if(keys.KeyS||keys.ArrowDown) p.addScaledVector(dir,-sp); if(keys.KeyD||keys.ArrowRight) p.addScaledVector(right,sp); if(keys.KeyA||keys.ArrowLeft) p.addScaledVector(right,-sp); collide(p); p.y=1.6; }
+  renderer.render(scene,camera); }
+function resize3D(){ if(!renderer) return; const r=threeCv.parentElement.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+
+/* ------------------------------------------------------------------ tabs */
+function setMode(m){ state.mode=m; $('tabPlan').classList.toggle('active',m==='plan'); $('tabWalk').classList.toggle('active',m==='walk');
+  planCv.style.display=m==='plan'?'block':'none'; threeCv.style.display=m==='walk'?'block':'none'; overlay.style.display=(m==='walk'&&scene)?'flex':'none';
+  hint.style.display=m==='plan'?'block':'none'; $('teleport').style.display=m==='walk'?'flex':'none'; if(m==='walk') resize3D(); else { if(controls) controls.unlock(); resizePlan(); } }
+$('tabPlan').onclick=()=>setMode('plan'); $('tabWalk').onclick=()=>{ if(!scene){ hint.textContent='Build first.'; return; } setMode('walk'); };
+$('buildBtn').onclick=()=>{ buildScene(); setMode('walk'); };
+window.addEventListener('resize',()=>{ resizePlan(); resize3D(); });
+resizePlan();
+
+/* URL params: ?demo=1 loads the sample and builds; &embed=1 hides the editor for the landing-page iframe */
+const q=new URLSearchParams(location.search);
+if(q.get('embed')){ $('side').style.display='none'; document.querySelector('header').style.display='none'; }
+if(q.get('demo')){ $('sampleBtn').click(); setTimeout(()=>{ if(state.rooms.length){ buildScene(); setMode('walk'); } },300); }
+</script>
+</body>
+</html>
