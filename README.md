@@ -5,7 +5,7 @@
 Wander turns a property listing's floorplan + photos into an interactive 3D walkthrough, delivered as a concierge service to estate agents and private sellers.
 
 - `index.html` — public site (pitch, pricing, request form)
-- `studio.html` — the internal build tool: trace rooms on a floorplan → generate a first-person 3D walkthrough
+- `studio.html` — internal build tool: trace rooms → 3D. `view.html?p=<name>` — public walkthrough viewer. `projects/` + `portfolio/` — sample properties (regenerate plans with `python3 tools/make_floorplans.py`).
 - `lib/` — three.js (vendored, no build step)
 
 ## Run locally

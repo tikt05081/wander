@@ -72,7 +72,7 @@
       <div class="field">Scale — real width of the whole plan image (metres)
         <input type="number" id="scaleM" value="12" step="0.5" min="2">
       </div>
-      <div class="field">Wall height (m) <input type="number" id="wallH" value="2.5" step="0.1" min="2"></div>
+      <div class="field">Wall height (m) <input type="number" id="wallH" value="2.6" step="0.1" min="2"></div>
     </div>
 
     <div class="card">
@@ -100,6 +100,8 @@
       <button id="buildBtn" class="primary" style="width:100%" disabled>Build 3D walkthrough →</button>
       <p style="margin-top:8px">Then click the view to lock the mouse. <span class="kbd">W A S D</span> move · mouse look · <span class="kbd">Shift</span> run · <span class="kbd">Esc</span> release.</p>
       <div class="row" style="margin-top:8px">
+        <button id="shareBtn">Share link ↗</button>
+        <button id="exportBtn">Screenshot</button>
         <button id="saveBtn">Save project</button>
         <label class="btn" for="loadFile">Load</label>
         <input type="file" id="loadFile" accept=".json">
@@ -118,8 +120,7 @@
 </main>
 
 <script type="module">
-import * as THREE from './lib/three.module.js';
-import { PointerLockControls } from './lib/PointerLockControls.js';
+import { createViewer } from './lib/wander-engine.js';
 
 /* ------------------------------------------------------------------ state */
 const state = {
@@ -255,107 +256,20 @@ $('sampleBtn').onclick = () => {
 $('saveBtn').onclick=()=>{ const blob=new Blob([JSON.stringify({plan:state.planDataURL,rooms:state.rooms,photos:state.photos,scale:$('scaleM').value,wallH:$('wallH').value})],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='wander-project.json'; a.click(); };
 $('loadFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ const d=JSON.parse(r.result); state.photos=d.photos||[]; $('scaleM').value=d.scale||12; $('wallH').value=d.wallH||2.5; const im=new Image(); im.onload=()=>{ state.planImg=im; state.planDataURL=d.plan; state.rooms=d.rooms||[]; renderRooms(); renderPhotos(); fitImage(); drawPlan(); updateBuild(); }; im.src=d.plan; }; r.readAsText(f); };
 
-/* ------------------------------------------------------------------ 3D */
-let renderer, scene, camera, controls, clock, colliders=[], keys={};
-const threeCv=$('three'), overlay=$('overlay');
-
+/* ------------------------------------------------------------------ 3D (shared engine) */
+let scene=null, viewer=null; const threeCv=$('three'), overlay=$('overlay');
 function buildScene(){
-  const scaleM = parseFloat($('scaleM').value)||12, H=parseFloat($('wallH').value)||2.5;
-  const iw=state.planImg.width, ih=state.planImg.height, mpp=scaleM/iw;   // metres per image pixel
-  const toW = p => ({ x:p.x*iw*mpp, z:p.y*ih*mpp });                           // normalised → metres
-  const depthM = ih*mpp;
-
-  if (!renderer) {
-    renderer=new THREE.WebGLRenderer({canvas:threeCv,antialias:true}); renderer.setPixelRatio(devicePixelRatio); renderer.shadowMap.enabled=true;
-    camera=new THREE.PerspectiveCamera(70,1,0.05,200);
-    controls=new PointerLockControls(camera, threeCv);
-    controls.addEventListener('lock',()=>overlay.style.display='none'); controls.addEventListener('unlock',()=>overlay.style.display='flex');
-    overlay.onclick=()=>controls.lock();
-    window.addEventListener('keydown',e=>keys[e.code]=true); window.addEventListener('keyup',e=>keys[e.code]=false);
-    clock=new THREE.Clock(); animate();
-  }
-  scene=new THREE.Scene(); scene.background=new THREE.Color(0xdfe7f2); scene.fog=new THREE.Fog(0xdfe7f2,25,60);
-  colliders=[];
-
-  // lights
-  scene.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.4)); scene.add(new THREE.AmbientLight(0xffffff,0.35));
-  const sun=new THREE.DirectionalLight(0xffffff,1.1); sun.position.set(scaleM, 12, depthM*1.2); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
-  const cam=sun.shadow.camera; cam.left=-scaleM; cam.right=scaleM*2; cam.top=depthM*2; cam.bottom=-depthM; scene.add(sun);
-
-  // ground / garden
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200), new THREE.MeshStandardMaterial({color:0x8fbf7a})); ground.rotation.x=-Math.PI/2; ground.position.y=-0.01; ground.receiveShadow=true; scene.add(ground);
-
-  const loader=new THREE.TextureLoader();
-  const floorMat=new THREE.MeshStandardMaterial({color:0xcbb08a, roughness:0.85});
-  const wallMatBase=new THREE.MeshStandardMaterial({color:0xf2f0ea, roughness:0.95});
-  const ceilMat=new THREE.MeshStandardMaterial({color:0xffffff, side:THREE.BackSide});
-
-  // shared-wall detection: any edge that appears in two rooms is interior; we cut a doorway in interior walls
-  const edgeKey=(a,b)=>{ const k1=`${a.x.toFixed(3)},${a.z.toFixed(3)}`, k2=`${b.x.toFixed(3)},${b.z.toFixed(3)}`; return k1<k2?k1+'|'+k2:k2+'|'+k1; };
-  const edgeCount={};
-  const roomEdges = state.rooms.map(r=>{ const w=r.pts.map(toW); const e=[]; for(let i=0;i<w.length;i++){ const a=w[i], b=w[(i+1)%w.length]; e.push([a,b]); edgeCount[edgeKey(a,b)]=(edgeCount[edgeKey(a,b)]||0)+1; } return e; });
-
-  state.rooms.forEach((room,ri)=>{
-    const w=room.pts.map(toW);
-    // floor + ceiling
-    const shape=new THREE.Shape(w.map(p=>new THREE.Vector2(p.x,p.z)));
-    const floor=new THREE.Mesh(new THREE.ShapeGeometry(shape), floorMat.clone()); floor.rotation.x=Math.PI/2; floor.receiveShadow=true; floor.material.side=THREE.DoubleSide; scene.add(floor);
-    const ceil=new THREE.Mesh(new THREE.ShapeGeometry(shape), ceilMat); ceil.rotation.x=Math.PI/2; ceil.position.y=H; ceil.material=new THREE.MeshStandardMaterial({color:0xffffff,side:THREE.DoubleSide,emissive:0x333333}); scene.add(ceil);
-    // label sprite
-    const c={x:w.reduce((a,p)=>a+p.x,0)/w.length, z:w.reduce((a,p)=>a+p.z,0)/w.length}; scene.add(makeLabel(room.name, c.x, H-0.3, c.z));
-    // photo texture for this room's walls
-    let wallMat=wallMatBase;
-    if (room.photo!=null) { const t=loader.load(state.photos[room.photo]); t.colorSpace=THREE.SRGBColorSpace; wallMat=new THREE.MeshStandardMaterial({map:t, roughness:0.9}); }
-    // walls
-    roomEdges[ri].forEach(([a,b])=>{
-      const interior = edgeCount[edgeKey(a,b)]>1;
-      // interior edge belongs to two rooms; only build once (from the room with lower index) to avoid z-fighting
-      if (interior && state.rooms.findIndex((_,j)=>roomEdges[j].some(([p,q])=>edgeKey(p,q)===edgeKey(a,b)))!==ri) return;
-      buildWall(a,b,H,wallMat,interior ? {door:true} : {window:true});
-    });
-  });
-
-  // camera start: centre of first room, eye height
-  const f0=state.rooms[0].pts.map(toW); const first={x:f0.reduce((a,p)=>a+p.x,0)/f0.length, z:f0.reduce((a,p)=>a+p.z,0)/f0.length}; camera.position.set(first.x,1.6,first.z); camera.lookAt(first.x+1,1.6,first.z);
-  const tp=$('teleport'); tp.innerHTML=''; state.rooms.forEach(r=>{ const w=r.pts.map(toW); const c={x:w.reduce((a,p)=>a+p.x,0)/w.length, z:w.reduce((a,p)=>a+p.z,0)/w.length}; const b=document.createElement('button'); b.textContent=r.name; b.style.cssText='background:rgba(24,27,34,.85);font-size:12px;padding:6px 10px'; b.onclick=()=>{ camera.position.set(c.x,1.6,c.z); }; tp.appendChild(b); });
-  resize3D();
-
-  function buildWall(a,b,H,mat,opts){
-    const len=Math.hypot(b.x-a.x,b.z-a.z); if(len<0.05) return;
-    const ang=Math.atan2(b.z-a.z,b.x-a.x), T=0.12;
-    const mid={x:(a.x+b.x)/2,z:(a.z+b.z)/2};
-    const segs=[];
-    if (opts.door && len>1.4) {            // doorway 0.9 m wide × 2.05 m tall in the middle
-      const dw=0.9, dh=2.05, side=(len-dw)/2;
-      segs.push({off:-len/2+side/2, w:side, y:H/2, h:H}); segs.push({off:len/2-side/2, w:side, y:H/2, h:H}); if(H-dh>0.02) segs.push({off:0, w:dw, y:dh+(H-dh)/2, h:H-dh, nocol:true});
-    } else if (opts.window && len>2.2) {   // window 1.2 m wide, sill 0.9 m, head 2.1 m
-      const ww=Math.min(1.4,len*0.4), sill=0.9, head=2.1, side=(len-ww)/2;
-      segs.push({off:-len/2+side/2, w:side, y:H/2, h:H}); segs.push({off:len/2-side/2, w:side, y:H/2, h:H});
-      segs.push({off:0,w:ww,y:sill/2,h:sill}); segs.push({off:0,w:ww,y:(H+head)/2,h:H-head});
-      const glass=new THREE.Mesh(new THREE.BoxGeometry(ww,head-sill,0.02), new THREE.MeshPhysicalMaterial({color:0xbfe3ff,transmission:0.9,transparent:true,opacity:0.5,roughness:0}));
-      glass.position.set(mid.x,(sill+head)/2,mid.z); glass.rotation.y=-ang; scene.add(glass);
-      segs.push({off:0,w:ww,y:(sill+head)/2,h:head-sill,nocol:false,invisible:true});
-    } else segs.push({off:0,w:len,y:H/2,h:H});
-    segs.forEach(s=>{
-      if (s.invisible){ pushCollider(mid,ang,s.off,s.w,T); return; }
-      const m=new THREE.Mesh(new THREE.BoxGeometry(s.w,s.h,T), mat); 
-      m.position.set(mid.x+Math.cos(ang)*s.off, s.y, mid.z+Math.sin(ang)*s.off); m.rotation.y=-ang; m.castShadow=true; m.receiveShadow=true; scene.add(m);
-      if(!s.nocol) pushCollider(mid,ang,s.off,s.w,T);
-    });
-  }
-  function pushCollider(mid,ang,off,w,T){ colliders.push({cx:mid.x+Math.cos(ang)*off, cz:mid.z+Math.sin(ang)*off, ang, hw:w/2, ht:T/2+0.25}); }
+  if(!viewer) viewer=createViewer(threeCv, overlay);
+  const scaleM=parseFloat($('scaleM').value)||12, H=parseFloat($('wallH').value)||2.6;
+  const built=viewer.load(state.rooms,{H, mpp:scaleM/state.planImg.width, iw:state.planImg.width, ih:state.planImg.height});
+  scene=true;
+  const tp=$('teleport'); tp.innerHTML=''; state.rooms.forEach((r,i)=>{ const b=document.createElement('button'); b.textContent=r.name; b.style.cssText='background:rgba(24,27,34,.85);font-size:12px;padding:6px 10px'; b.onclick=()=>viewer.teleport(built.roomCentres[i]); tp.appendChild(b); });
+  viewer.resize();
 }
-function makeLabel(text,x,y,z){ const c=document.createElement('canvas'); c.width=512; c.height=128; const g=c.getContext('2d'); g.fillStyle='rgba(20,22,30,0.7)'; g.roundRect(0,0,512,128,24); g.fill(); g.fillStyle='#fff'; g.font='bold 56px sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(text,256,64); const t=new THREE.CanvasTexture(c); const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,opacity:0.9})); s.scale.set(1.2,0.3,1); s.position.set(x,y,z); return s; }
-
-function collide(pos){ // push the player out of any wall's oriented box
-  for(const c of colliders){ const dx=pos.x-c.cx, dz=pos.z-c.cz; const cos=Math.cos(c.ang), sin=Math.sin(c.ang);
-    const lx=dx*cos+dz*sin, lz=-dx*sin+dz*cos; if(Math.abs(lx)<c.hw && Math.abs(lz)<c.ht){ const push=(c.ht-Math.abs(lz))*Math.sign(lz||1); pos.x+=-push*sin; pos.z+=push*cos; } }
-}
-function animate(){ requestAnimationFrame(animate); if(!scene) return; const dt=Math.min(clock.getDelta(),0.05);
-  if(controls.isLocked){ const sp=(keys.ShiftLeft||keys.ShiftRight?4.5:2.2)*dt; const dir=new THREE.Vector3(); camera.getWorldDirection(dir); dir.y=0; dir.normalize(); const right=new THREE.Vector3().crossVectors(dir,new THREE.Vector3(0,1,0));
-    const p=camera.position; if(keys.KeyW||keys.ArrowUp) p.addScaledVector(dir,sp); if(keys.KeyS||keys.ArrowDown) p.addScaledVector(dir,-sp); if(keys.KeyD||keys.ArrowRight) p.addScaledVector(right,sp); if(keys.KeyA||keys.ArrowLeft) p.addScaledVector(right,-sp); collide(p); p.y=1.6; }
-  renderer.render(scene,camera); }
-function resize3D(){ if(!renderer) return; const r=threeCv.parentElement.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+function resize3D(){ if(viewer) viewer.resize(); }
+const controls={ unlock(){ if(viewer) viewer.controls.unlock(); } };
+$('shareBtn').onclick=()=>{ const data={title:prompt('Property title for the link?','Walkthrough')||'Walkthrough',rooms:state.rooms,scale:$('scaleM').value,wallH:$('wallH').value,iw:state.planImg.width,ih:state.planImg.height}; const url=location.href.replace(/studio(\.html)?.*$/,'')+'view.html?data='+btoa(encodeURIComponent(JSON.stringify(data))); navigator.clipboard.writeText(url).then(()=>hint.textContent='Share link copied to clipboard.'); window.open(url,'_blank'); };
+$('exportBtn').onclick=()=>{ if(!viewer) return; const a=document.createElement('a'); a.href=viewer.screenshot(); a.download='wander-shot.jpg'; a.click(); };
 
 /* ------------------------------------------------------------------ tabs */
 function setMode(m){ state.mode=m; $('tabPlan').classList.toggle('active',m==='plan'); $('tabWalk').classList.toggle('active',m==='walk');

@@ -51,6 +51,20 @@
   input,textarea,select{padding:11px 12px;border-radius:9px;border:1px solid var(--line);background:#0f1115;color:var(--text);font-size:15px;font-family:inherit}
   textarea{min-height:90px;resize:vertical}
   .note{font-size:13px;color:var(--muted)}
+
+  .pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .pf{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .ba{position:relative;aspect-ratio:16/10;background:#fff;overflow:hidden;user-select:none}
+  .ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+  .ba img.before{object-fit:contain;background:#fff;clip-path:inset(0 50% 0 0)}
+  .ba::after{content:"";position:absolute;top:0;bottom:0;left:var(--x,50%);width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);transform:translateX(-1px)}
+  .ba input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
+  .ba .lbl{position:absolute;bottom:10px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:4px 8px;border-radius:99px;background:rgba(15,17,21,.75);color:#fff;pointer-events:none}
+  .ba .l{left:10px}.ba .r{right:10px}
+  .pf-meta{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px}
+  .pf-meta b{display:block;font-size:15px}.pf-meta span{font-size:13px;color:var(--muted)}
+  .pf-meta .btn{padding:8px 12px;font-size:13px}
+  @media(max-width:820px){.pf-grid{grid-template-columns:1fr}}
   footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   @media(max-width:820px){.hero{grid-template-columns:1fr;padding-top:36px}h1{font-size:38px}.grid3,.price,form{grid-template-columns:1fr}nav .links{display:none}}
 </style>
@@ -59,7 +73,7 @@
 <div class="wrap">
   <nav>
     <div class="logo"><span>W</span>ander</div>
-    <div class="links"><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="studio.html">Studio</a></div>
+    <div class="links"><a href="#work">Work</a><a href="#how">How it works</a><a href="#pricing">Pricing</a></div>
     <a class="btn" href="#request">Request a walkthrough</a>
   </nav>
 
@@ -70,12 +84,12 @@
       <p class="lede">Send us the floorplan and photos you already have. We hand you back an interactive 3D walkthrough for the listing — no camera, no site visit, no software to learn.</p>
       <div class="cta">
         <a class="btn" href="#request">Request a walkthrough</a>
-        <a class="btn ghost" href="studio.html?demo=1" target="_blank">Try the live demo ↗</a>
+        <a class="btn ghost" href="#work">See recent work</a>
       </div>
     </div>
     <div class="demo">
       <span class="tag" style="top:auto;bottom:12px">Live demo · click, then WASD to walk</span>
-      <iframe src="studio.html?demo=1&embed=1" title="Wander demo" allow="pointer-lock"></iframe>
+      <iframe src="view.html?p=perth-road-flat&embed=1" title="Wander demo" allow="pointer-lock" loading="lazy"></iframe>
     </div>
   </header>
 
@@ -85,6 +99,69 @@
     <div><b>Works on any</b> phone or laptop</div>
     <div>Built in <b>Dundee</b>, serving all of the UK</div>
   </div>
+
+
+  <section id="work">
+    <h2>Recent work</h2>
+    <p class="sub">Six Dundee-area homes. Drag the slider — the left is the floorplan an agent sent us, the right is what buyers got back. Every one is walkable: click through and have a wander.</p>
+    <div class="pf-grid">
+      <div class="pf">
+        <div class="ba" data-key="perth-road-flat">
+          <img class="after" src="portfolio/perth-road-flat-3d.jpg" alt="3D walkthrough of Perth Road, West End">
+          <img class="before" src="portfolio/perth-road-flat-plan.png" alt="Floorplan of Perth Road, West End">
+          <input type="range" min="0" max="100" value="50" aria-label="Before / after slider">
+          <span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span>
+        </div>
+        <div class="pf-meta"><div><b>Perth Road, West End</b><span>2 bed Victorian tenement flat</span></div><a class="btn ghost" href="view.html?p=perth-road-flat" target="_blank">Walk through ↗</a></div>
+      </div>
+      <div class="pf">
+        <div class="ba" data-key="broughty-ferry-semi">
+          <img class="after" src="portfolio/broughty-ferry-semi-3d.jpg" alt="3D walkthrough of Broughty Ferry">
+          <img class="before" src="portfolio/broughty-ferry-semi-plan.png" alt="Floorplan of Broughty Ferry">
+          <input type="range" min="0" max="100" value="50" aria-label="Before / after slider">
+          <span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span>
+        </div>
+        <div class="pf-meta"><div><b>Broughty Ferry</b><span>3 bed semi-detached</span></div><a class="btn ghost" href="view.html?p=broughty-ferry-semi" target="_blank">Walk through ↗</a></div>
+      </div>
+      <div class="pf">
+        <div class="ba" data-key="city-quay-apartment">
+          <img class="after" src="portfolio/city-quay-apartment-3d.jpg" alt="3D walkthrough of City Quay">
+          <img class="before" src="portfolio/city-quay-apartment-plan.png" alt="Floorplan of City Quay">
+          <input type="range" min="0" max="100" value="50" aria-label="Before / after slider">
+          <span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span>
+        </div>
+        <div class="pf-meta"><div><b>City Quay</b><span>1 bed waterfront apartment</span></div><a class="btn ghost" href="view.html?p=city-quay-apartment" target="_blank">Walk through ↗</a></div>
+      </div>
+      <div class="pf">
+        <div class="ba" data-key="newport-detached">
+          <img class="after" src="portfolio/newport-detached-3d.jpg" alt="3D walkthrough of Newport-on-Tay">
+          <img class="before" src="portfolio/newport-detached-plan.png" alt="Floorplan of Newport-on-Tay">
+          <input type="range" min="0" max="100" value="50" aria-label="Before / after slider">
+          <span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span>
+        </div>
+        <div class="pf-meta"><div><b>Newport-on-Tay</b><span>4 bed detached</span></div><a class="btn ghost" href="view.html?p=newport-detached" target="_blank">Walk through ↗</a></div>
+      </div>
+      <div class="pf">
+        <div class="ba" data-key="monifieth-bungalow">
+          <img class="after" src="portfolio/monifieth-bungalow-3d.jpg" alt="3D walkthrough of Monifieth">
+          <img class="before" src="portfolio/monifieth-bungalow-plan.png" alt="Floorplan of Monifieth">
+          <input type="range" min="0" max="100" value="50" aria-label="Before / after slider">
+          <span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span>
+        </div>
+        <div class="pf-meta"><div><b>Monifieth</b><span>2 bed detached bungalow</span></div><a class="btn ghost" href="view.html?p=monifieth-bungalow" target="_blank">Walk through ↗</a></div>
+      </div>
+      <div class="pf">
+        <div class="ba" data-key="barnhill-townhouse">
+          <img class="after" src="portfolio/barnhill-townhouse-3d.jpg" alt="3D walkthrough of Barnhill">
+          <img class="before" src="portfolio/barnhill-townhouse-plan.png" alt="Floorplan of Barnhill">
+          <input type="range" min="0" max="100" value="50" aria-label="Before / after slider">
+          <span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span>
+        </div>
+        <div class="pf-meta"><div><b>Barnhill</b><span>New-build 3 bed townhouse</span></div><a class="btn ghost" href="view.html?p=barnhill-townhouse" target="_blank">Walk through ↗</a></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">Sample properties, modelled from typical local floorplans to show the service. Client work is added with permission.</p>
+  </section>
 
   <section id="how">
     <h2>How it works</h2>
@@ -133,6 +210,9 @@
     <div>Walk through it before you view it.</div>
   </footer>
 </div>
+<script>
+  document.querySelectorAll('.ba').forEach(el=>{ const r=el.querySelector('input'), b=el.querySelector('.before'); const set=v=>{ b.style.clipPath=`inset(0 ${100-v}% 0 0)`; el.style.setProperty('--x',v+'%'); }; r.addEventListener('input',()=>set(r.value)); set(50); });
+</script>
 <script>
   // ── Change your email here (one place) ──
   const EMAIL = "hello@example.com";

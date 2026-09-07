@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Wander — walkthrough</title>
+<style>
+  :root{--line:#2a2f3a;--muted:#9aa2b5}
+  *{box-sizing:border-box} html,body{margin:0;height:100%;background:#0f1115;color:#eef0f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;overflow:hidden}
+  #stage{position:fixed;inset:0} canvas{display:block;width:100%;height:100%}
+  #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,18,.55);cursor:pointer;backdrop-filter:blur(2px)}
+  #overlay .card{text-align:center;padding:26px 34px;border-radius:16px;background:rgba(15,17,21,.85);border:1px solid var(--line)}
+  #overlay h2{margin:0 0 4px;font-size:22px} #overlay p{margin:0;color:var(--muted);font-size:14px} #overlay .t{margin-top:10px;font-size:12px;color:var(--muted)}
+  #top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(rgba(10,12,18,.75),transparent);pointer-events:none}
+  #top *{pointer-events:auto}
+  .logo{font-weight:700;font-size:16px;text-decoration:none;color:#fff} .logo span{color:#6c8cff}
+  #title{font-size:14px;color:#dfe3ec} #title small{color:var(--muted);margin-left:8px}
+  #rooms{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;flex-wrap:wrap;max-width:60%}
+  #rooms button{background:rgba(15,17,21,.8);border:1px solid var(--line);color:#eef0f5;padding:7px 11px;border-radius:99px;font-size:12px;cursor:pointer}
+  #rooms button:hover{border-color:#6c8cff}
+  #stick{position:absolute;right:22px;bottom:22px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:none;touch-action:none}
+  #stick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.55)}
+  @media(pointer:coarse){#stick{display:block}}
+  #brand{position:absolute;right:16px;top:14px;font-size:11px;color:var(--muted);letter-spacing:1px}
+  #load{position:absolute;inset:0;display:grid;place-items:center;background:#0f1115;color:var(--muted);font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="top"><a class="logo" href="./"><span>W</span>ander</a><div id="title"></div></div>
+  <div id="brand">WALKTHROUGH</div>
+  <div id="rooms"></div>
+  <div id="stick"><i></i></div>
+  <div id="overlay"><div class="card"><h2>Click to walk in</h2><p>W A S D to move · mouse to look · Shift to run · Esc to release</p><div class="t">On a phone: drag to look, use the joystick to move</div></div></div>
+  <div id="load">Building the house…</div>
+</div>
+<script type="module">
+import { createViewer } from './lib/wander-engine.js';
+const q = new URLSearchParams(location.search);
+const src = q.get('p') ? `projects/${q.get('p')}.json` : null;
+const overlay = document.getElementById('overlay');
+const v = createViewer(document.getElementById('c'), overlay);
+let project;
+if (src) project = await (await fetch(src)).json();
+else if (q.get('data')) project = JSON.parse(decodeURIComponent(atob(q.get('data'))));
+else { document.getElementById('load').textContent = 'No walkthrough specified.'; throw 0; }
+document.getElementById('title').innerHTML = `${project.title||'Walkthrough'}<small>${project.rooms.length} rooms</small>`;
+// image size is needed for scale; load the plan image (or use stored dims)
+let iw = project.iw, ih = project.ih;
+if (!iw) { const im = new Image(); im.src = project.planUrl || project.plan; await new Promise(r => im.onload = r); iw = im.width; ih = im.height; }
+const built = v.load(project.rooms, { H: +project.wallH || 2.6, mpp: (+project.scale)/iw, iw, ih, quality: q.get('embed') ? 'lite' : 'full' });
+const rb = document.getElementById('rooms'); project.rooms.forEach((r,i) => { const b=document.createElement('button'); b.textContent=r.name; b.onclick=()=>v.teleport(built.roomCentres[i]); rb.appendChild(b); });
+document.getElementById('load').remove();
+if (q.get('embed')) overlay.querySelector('h2').textContent = 'Click to walk in';
+// touch joystick
+const st=document.getElementById('stick'), knob=st.querySelector('i'); let sid=null;
+st.addEventListener('pointerdown',e=>{sid=e.pointerId; st.setPointerCapture(sid);}); st.addEventListener('pointerup',()=>{sid=null; v.touch.move={x:0,y:0}; knob.style.left='35px'; knob.style.top='35px';});
+st.addEventListener('pointermove',e=>{ if(e.pointerId!==sid) return; const r=st.getBoundingClientRect(); let x=(e.clientX-r.left-55)/45, y=(e.clientY-r.top-55)/45; const m=Math.hypot(x,y); if(m>1){x/=m;y/=m;} v.touch.move={x,y}; knob.style.left=35+x*35+'px'; knob.style.top=35+y*35+'px'; });
+</script>
+</body>
+</html>
