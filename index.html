@@ -3,255 +3,267 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wander — 3D walkthroughs from the floorplan you already have</title>
-<meta name="description" content="Wander turns a listing's floorplan into a furnished, interactive 3D walkthrough buyers can explore on their phone. No camera, no site visit. 48-hour turnaround, from £89.">
-<meta property="og:title" content="Wander — walk through it before you view it">
-<meta property="og:description" content="Furnished 3D walkthroughs for property listings, built from the floorplan. From £89, 48 hours.">
-<meta property="og:image" content="https://wander-gamma.vercel.app/portfolio/hero.jpg">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231c1a17'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23f4efe6' font-family='Georgia'>W</text></svg>">
+<title>Wander — see the home before you see the home</title>
+<meta name="description" content="Wander turns a property's floor plan and listing photographs into an interactive 3D walkthrough buyers can explore from any device.">
+<meta property="og:title" content="Wander — see the home before you see the home">
+<meta property="og:description" content="Floor plan + photographs → interactive 3D property. From £89.">
+<meta property="og:image" content="https://wander-gamma.vercel.app/portfolio/brand-hero.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230e0d0c'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23f4efe6' font-family='Georgia'>W</text></svg>">
 <style>
-  :root{--bg:#f6f3ee;--bg2:#fbf9f6;--ink:#1c1a17;--ink2:#4c4741;--muted:#7d766d;--line:#e6e0d6;--accent:#1c1a17;--gold:#b9853d;--card:#ffffff}
+  :root{--bg:#0e0d0c;--bg2:#151311;--cream:#f4efe6;--cream2:#cfc7ba;--muted:#8d857a;--line:rgba(244,239,230,.12);--gold:#d9b46a;--accent:#e9dcbd}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
-  .serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;letter-spacing:-.01em}
+  body{margin:0;background:var(--bg);color:var(--cream);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;line-height:1.5;overflow-x:hidden}
+  .serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;letter-spacing:-.015em;font-weight:400}
   a{color:inherit}
-  .wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;background:var(--cream);color:#0e0d0c;text-decoration:none;font-weight:600;font-size:14px;letter-spacing:.01em;border:1px solid var(--cream);cursor:pointer;transition:transform .2s,background .2s}
+  .btn:hover{transform:translateY(-1px);background:#fff}
+  .btn.ghost{background:transparent;color:var(--cream);border-color:rgba(244,239,230,.35)}
+  .btn.ghost:hover{background:rgba(244,239,230,.08)}
+  .btn.sm{padding:10px 16px;font-size:13px}
+  .kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
   /* nav */
-  nav{position:sticky;top:0;z-index:20;background:rgba(246,243,238,.85);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
-  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:66px}
-  .logo{font-size:24px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:10px}
-  .logo i{width:30px;height:30px;border-radius:8px;background:var(--ink);color:#f4efe6;display:grid;place-items:center;font-style:normal;font-size:18px}
-  nav .links{display:flex;gap:28px;font-size:14px;color:var(--ink2)}
-  nav .links a{text-decoration:none}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:600;font-size:14px;border:1px solid var(--ink);cursor:pointer;transition:transform .15s,background .15s}
-  .btn:hover{transform:translateY(-1px);background:#2c2924}
-  .btn.light{background:#fff;color:var(--ink);border-color:var(--line)}
-  .btn.light:hover{background:#fbf9f6}
-  .btn.sm{padding:9px 14px;font-size:13px}
+  nav{position:fixed;inset:0 0 auto 0;z-index:30;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+  nav.solid{background:rgba(14,13,12,.8);backdrop-filter:blur(14px) saturate(1.3);border-color:var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{font-size:22px;text-decoration:none;letter-spacing:.14em;text-transform:uppercase;font-weight:500}
+  nav .links{display:flex;gap:34px;font-size:13px;color:var(--cream2);letter-spacing:.04em}
+  nav .links a{text-decoration:none;transition:color .2s}
+  nav .links a:hover{color:#fff}
   /* hero */
-  .hero{padding:64px 0 28px}
-  .hero h1{font-size:clamp(40px,6vw,72px);line-height:1.02;margin:0 0 20px;font-weight:500;max-width:14ch}
-  .hero h1 em{font-style:italic;color:var(--gold)}
-  .hero .row{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end}
-  .hero p{font-size:19px;color:var(--ink2);margin:0 0 26px;max-width:44ch}
-  .hero .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .hero .cta small{color:var(--muted);font-size:13px}
-  .hero-media{margin-top:44px;border-radius:22px;overflow:hidden;position:relative;aspect-ratio:16/8.2;background:#ddd;box-shadow:0 30px 80px -30px rgba(28,26,23,.45)}
-  .hero-media img,.hero-media iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
-  .hero-media .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(to top,rgba(0,0,0,.35),rgba(0,0,0,0) 45%);cursor:pointer}
-  .hero-media .play span{background:#fff;color:var(--ink);padding:14px 22px;border-radius:999px;font-weight:600;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;gap:10px;align-items:center}
-  .hero-media .cap{position:absolute;left:18px;bottom:16px;color:#fff;font-size:13px;text-shadow:0 1px 8px rgba(0,0,0,.5)}
-  .hero-media .cap b{display:block;font-size:15px}
-  .hero-media.live .play{display:none}
-  /* trust strip */
-  .strip{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:34px 0;border-bottom:1px solid var(--line);color:var(--ink2);font-size:14px}
-  .strip div b{display:block;font-size:22px;color:var(--ink);font-weight:600}
-  section{padding:88px 0}
-  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:12px}
-  h2{font-size:clamp(30px,4vw,44px);line-height:1.1;font-weight:500;margin:0 0 14px}
-  .sub{font-size:18px;color:var(--ink2);max-width:60ch;margin:0 0 40px}
+  .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden}
+  .hero .bg{position:absolute;inset:0;background:url(portfolio/brand-hero.jpg) center/cover;transform:scale(1.04);animation:kb 22s ease-in-out infinite alternate}
+  @keyframes kb{to{transform:scale(1.12) translateY(-1.5%)}}
+  .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,12,.35) 0%,rgba(14,13,12,.05) 35%,rgba(14,13,12,.55) 70%,rgba(14,13,12,.98) 100%)}
+  .hero .wrap{position:relative;padding-bottom:84px;padding-top:140px;width:100%}
+  .hero h1{font-size:clamp(46px,7.4vw,104px);line-height:.98;margin:18px 0 26px;max-width:12ch}
+  .hero h1 em{font-style:italic;color:var(--accent)}
+  .hero p{font-size:clamp(17px,1.5vw,21px);color:var(--cream2);max-width:52ch;margin:0 0 34px}
+  .hero .cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero .cta small{color:var(--muted);font-size:13px;margin-left:6px}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s ease}
+  .reveal.in{opacity:1;transform:none}
+  /* pipeline */
+  .pipe{padding:120px 0 40px}
+  .pipe h2{font-size:clamp(34px,4.6vw,64px);line-height:1.02;margin:14px 0 18px;max-width:16ch}
+  .pipe .lede{font-size:18px;color:var(--cream2);max-width:56ch;margin:0 0 56px}
+  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:18px;align-items:stretch}
+  .flow .arrow{align-self:center;color:var(--muted);font-size:26px}
+  .stage{background:var(--bg2);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+  .stage .media{aspect-ratio:4/3;background:#1d1a17;position:relative;overflow:hidden}
+  .stage .media img{width:100%;height:100%;object-fit:cover;display:block}
+  .stage .media.plan img{object-fit:contain;background:#f4efe6;padding:14px}
+  .stage .txt{padding:20px 22px 24px}
+  .stage .txt b{display:block;font-size:17px;margin-bottom:6px}
+  .stage .txt span{font-size:14px;color:var(--cream2)}
+  .stage .num{position:absolute;top:14px;left:14px;font-size:11px;letter-spacing:.2em;background:rgba(14,13,12,.7);padding:6px 10px;border-radius:999px;color:var(--gold)}
+  .ai{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:16px;height:100%;background:radial-gradient(120% 80% at 50% 0%,rgba(217,180,106,.14),transparent 60%),#1d1a17}
+  .ai div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--cream2);background:rgba(14,13,12,.5);display:flex;align-items:center;gap:8px}
+  .ai div::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold);animation:pulse 2.4s infinite}
+  .ai div:nth-child(2)::before{animation-delay:.4s}.ai div:nth-child(3)::before{animation-delay:.8s}.ai div:nth-child(4)::before{animation-delay:1.2s}.ai div:nth-child(5)::before{animation-delay:1.6s}.ai div:nth-child(6)::before{animation-delay:2s}
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+  .honest{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:56px}
+  .honest div{background:var(--bg);padding:22px 24px}
+  .honest b{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .honest span{color:var(--cream2);font-size:15px}
+  /* demo */
+  .demo{padding:110px 0}
+  .demo h2{font-size:clamp(36px,5.2vw,74px);line-height:1;margin:14px 0 14px}
+  .demo .lede{color:var(--cream2);font-size:18px;margin:0 0 36px}
+  .frame{position:relative;border-radius:24px;overflow:hidden;background:#1d1a17;box-shadow:0 60px 140px -50px rgba(0,0,0,.9),0 0 0 1px var(--line);aspect-ratio:16/9}
+  .frame iframe,.frame img{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover}
+  .frame .start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:linear-gradient(180deg,rgba(14,13,12,.15),rgba(14,13,12,.55));cursor:pointer}
+  .frame .start .btn{font-size:16px;padding:18px 28px}
+  .frame .start small{color:var(--cream2);font-size:13px}
+  .frame.live .start{display:none}
+  .demo-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+  .demo-bar .pill{border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:13px;color:var(--cream2);background:var(--bg2);cursor:pointer;transition:border-color .2s,color .2s}
+  .demo-bar .pill:hover,.demo-bar .pill.on{border-color:var(--gold);color:#fff}
+  .demo-bar .hint{margin-left:auto;font-size:12px;color:var(--muted)}
+  .demo-bar kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:inherit;font-size:11px;color:var(--cream)}
   /* work */
-  .pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-  .pf{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .2s,box-shadow .2s}
-  .pf:hover{transform:translateY(-2px);box-shadow:0 20px 50px -25px rgba(28,26,23,.35)}
-  .ba{position:relative;aspect-ratio:16/10;background:#fff;overflow:hidden;user-select:none}
-  .ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-  .ba img.before{object-fit:contain;background:#fff;clip-path:inset(0 50% 0 0)}
-  .ba::after{content:"";position:absolute;top:0;bottom:0;left:var(--x,50%);width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.2);transform:translateX(-1px)}
-  .ba .knob{position:absolute;top:50%;left:var(--x,50%);transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.3);display:grid;place-items:center;font-size:13px;color:var(--ink);pointer-events:none}
-  .ba input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
-  .ba .lbl{position:absolute;bottom:12px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:rgba(28,26,23,.8);color:#fff;pointer-events:none}
-  .ba .l{left:12px}.ba .r{right:12px}
-  .pf-meta{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;gap:10px}
-  .pf-meta b{display:block;font-size:16px;font-weight:600}.pf-meta span{font-size:13px;color:var(--muted)}
-  .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
-  .gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid var(--line)}
-  /* how */
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .step{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px}
-  .step .n{font-family:Georgia,serif;font-size:30px;color:var(--gold);line-height:1;margin-bottom:14px}
-  .step h3{margin:0 0 8px;font-size:18px;font-weight:600}
-  .step p{margin:0;color:var(--ink2);font-size:15px}
-  /* compare table */
-  .cmp{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;font-size:15px}
-  .cmp th,.cmp td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line)}
-  .cmp th{font-weight:600;background:var(--bg2)}
-  .cmp tr:last-child td{border-bottom:0}
-  .cmp td.y{color:#2c7a4b;font-weight:600}.cmp td.n{color:var(--muted)}
-  .cmp th:first-child,.cmp td:first-child{color:var(--ink2)}
+  .work{padding:60px 0 110px}
+  .work h2{font-size:clamp(32px,4vw,56px);line-height:1.02;margin:14px 0 40px}
+  .pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .pf{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);border:1px solid var(--line);text-decoration:none;display:block;aspect-ratio:4/3}
+  .pf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+  .pf img.plan{object-fit:contain;background:#f4efe6;padding:10px;opacity:0;transition:opacity .4s}
+  .pf:hover img.render{transform:scale(1.05)}
+  .pf:hover img.plan,.pf:hover .hov{opacity:1}
+  .pf .cap{position:absolute;left:0;right:0;bottom:0;padding:18px;background:linear-gradient(transparent,rgba(14,13,12,.85));display:flex;justify-content:space-between;align-items:end}
+  .pf .cap b{display:block;font-size:16px}.pf .cap span{font-size:12px;color:var(--cream2)}
+  .pf .cap i{font-style:normal;font-size:12px;border:1px solid rgba(244,239,230,.35);padding:7px 11px;border-radius:999px;white-space:nowrap}
+  .pf .hov{opacity:0;transition:opacity .3s;position:absolute;top:14px;left:14px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:rgba(14,13,12,.7);padding:6px 10px;border-radius:999px}
+  /* full-bleed image band */
+  .band{position:relative;min-height:70svh;display:flex;align-items:center;overflow:hidden}
+  .band .bg{position:absolute;inset:0;background:url(portfolio/brand-kitchen.jpg) center/cover;}
+  .band .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,13,12,.92) 0%,rgba(14,13,12,.55) 50%,rgba(14,13,12,.15) 100%)}
+  .band .wrap{position:relative;padding:100px 32px}
+  .band h2{font-size:clamp(34px,4.6vw,64px);line-height:1.02;max-width:14ch;margin:14px 0 20px}
+  .band p{color:var(--cream2);font-size:18px;max-width:46ch;margin:0 0 30px}
   /* pricing */
-  .price{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:860px}
-  .plan{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px;display:flex;flex-direction:column}
-  .plan.hot{border-color:var(--ink);box-shadow:0 30px 60px -35px rgba(28,26,23,.5)}
-  .plan .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
-  .plan .amt{font-size:52px;font-weight:500;letter-spacing:-.03em;margin:8px 0 2px}
-  .plan .amt small{font-size:15px;color:var(--muted);letter-spacing:0;margin-left:4px}
-  .plan ul{padding:0;margin:18px 0 26px;list-style:none;color:var(--ink2);font-size:15px}
-  .plan li{padding:7px 0 7px 26px;position:relative;border-bottom:1px dashed var(--line)}
-  .plan li::before{content:"✓";position:absolute;left:0;color:var(--gold);font-weight:700}
-  .plan li:last-child{border-bottom:0}
+  .pricing{padding:120px 0}
+  .pricing h2{font-size:clamp(34px,4.6vw,64px);line-height:1.02;margin:14px 0 14px}
+  .pricing .lede{color:var(--cream2);font-size:18px;margin:0 0 48px;max-width:56ch}
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:920px}
+  .plan{border:1px solid var(--line);border-radius:24px;padding:34px;background:var(--bg2);display:flex;flex-direction:column}
+  .plan.hot{border-color:rgba(217,180,106,.6);background:linear-gradient(180deg,rgba(217,180,106,.08),transparent 40%),var(--bg2)}
+  .plan .tag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .plan .amt{font-size:64px;line-height:1;margin:12px 0 4px}
+  .plan .amt small{font-size:14px;color:var(--muted);margin-left:6px;letter-spacing:0}
+  .plan ul{list-style:none;padding:0;margin:22px 0 30px;color:var(--cream2);font-size:15px}
+  .plan li{padding:9px 0 9px 24px;position:relative;border-bottom:1px solid var(--line)}
+  .plan li::before{content:"—";position:absolute;left:0;color:var(--gold)}
+  .plan li:last-child{border:0}
   .plan .btn{margin-top:auto;justify-content:center}
-  /* quote */
-  .quote{background:var(--ink);color:#f4efe6;border-radius:24px;padding:56px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
-  .quote h2{color:#fff}
-  .quote p{color:#cfc7ba;font-size:17px}
-  .quote .btn{background:#fff;color:var(--ink);border-color:#fff}
-  .quote .btn:hover{background:#f4efe6}
-  .quote img{width:100%;border-radius:14px;aspect-ratio:4/3;object-fit:cover}
-  /* faq */
-  details{border-bottom:1px solid var(--line);padding:18px 0}
-  summary{cursor:pointer;font-weight:600;font-size:17px;list-style:none;display:flex;justify-content:space-between;align-items:center}
-  summary::after{content:"+";font-size:22px;color:var(--muted)}
+  /* faq + request */
+  .faq{padding:0 0 100px}
+  .faq h2{font-size:clamp(30px,3.6vw,48px);margin:14px 0 26px}
+  details{border-bottom:1px solid var(--line);padding:20px 0}
+  summary{cursor:pointer;font-size:18px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  summary::after{content:"+";color:var(--muted);font-size:24px}
   details[open] summary::after{content:"–"}
-  details p{margin:10px 0 0;color:var(--ink2);max-width:70ch}
-  /* request */
-  .req{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center}
-  .req h2{margin-bottom:8px}
-  .req ol{color:var(--ink2);padding-left:20px;margin:0 0 20px;font-size:15px}
-  .req ol li{margin:6px 0}
-  footer{border-top:1px solid var(--line);padding:36px 0;color:var(--muted);font-size:13px}
-  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center}
-  @media(max-width:900px){.hero .row,.price,.quote,.req{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.pf-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr}nav .links{display:none}.quote{padding:32px}section{padding:64px 0}}
+  details p{margin:12px 0 0;color:var(--cream2);max-width:72ch;font-size:15px}
+  .request{padding:0 0 120px}
+  .req{border:1px solid var(--line);border-radius:28px;padding:64px;background:radial-gradient(90% 100% at 100% 0%,rgba(217,180,106,.12),transparent 55%),var(--bg2);display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+  .req h2{font-size:clamp(34px,4.6vw,60px);line-height:1.02;margin:14px 0 16px}
+  .req p{color:var(--cream2);font-size:17px;margin:0 0 26px;max-width:46ch}
+  .req .side{font-size:14px;color:var(--cream2);border-left:1px solid var(--line);padding-left:28px}
+  .req .side b{display:block;color:var(--cream);margin-bottom:10px;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+  .req .side div{padding:6px 0}
+  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  @media(max-width:960px){.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg);justify-self:center}.honest,.pf-grid,.plans,.req{grid-template-columns:1fr}nav .links{display:none}.req{padding:36px}.req .side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:20px}}
 </style>
 </head>
 <body>
-<nav><div class="wrap">
-  <a class="logo serif" href="#"><i>W</i>Wander</a>
-  <div class="links"><a href="#work">Recent work</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
-  <a class="btn sm" href="#request">Request a walkthrough</a>
+<nav id="nav"><div class="wrap">
+  <a class="logo serif" href="#">Wander</a>
+  <div class="links"><a href="#how">How it works</a><a href="#demo">Walk through one</a><a href="#work">Work</a><a href="#pricing">Pricing</a></div>
+  <a class="btn sm" href="#request">Create a walkthrough</a>
 </div></nav>
 
-<header class="hero"><div class="wrap">
-  <div class="row">
-    <div>
-      <div class="kicker">For estate agents &amp; private sellers</div>
-      <h1 class="serif">Let buyers walk through it <em>before</em> they view it.</h1>
-    </div>
-    <div>
-      <p>Send us the floorplan you already have. Within 48 hours you get a furnished, interactive 3D walkthrough of the home — one link that works on any phone, ready for the listing.</p>
-      <div class="cta"><a class="btn" href="#request">Request a walkthrough</a><a class="btn light" href="#work">See recent work</a><small>From £89 · first one free</small></div>
-    </div>
+<header class="hero">
+  <div class="bg"></div><div class="shade"></div>
+  <div class="wrap">
+    <div class="kicker reveal">Wander · interactive 3D property</div>
+    <h1 class="serif reveal">See the home <em>before</em> you see the home.</h1>
+    <p class="reveal">Turn a property's floor plan and existing photographs into an interactive 3D walkthrough buyers can explore from any device.</p>
+    <div class="cta reveal"><a class="btn" href="#request">Create a walkthrough</a><a class="btn ghost" href="#demo">See an example ↓</a><small>From £89 · 48 hours · first one free</small></div>
   </div>
-  <div class="hero-media" id="heroMedia">
-    <img src="portfolio/hero.jpg" alt="Furnished 3D walkthrough of a Perth Road living room">
-    <div class="play" id="heroPlay"><span>▶&nbsp; Walk through this flat</span></div>
-    <div class="cap"><b>Perth Road, West End</b>2 bed Victorian tenement · built from the floorplan alone</div>
-  </div>
-</div></header>
+</header>
 
-<div class="wrap"><div class="strip">
-  <div><b>48 hrs</b>typical turnaround</div>
-  <div><b>£0</b>equipment or site visits</div>
-  <div><b>Any device</b>phone, tablet, laptop</div>
-  <div><b>1 link</b>for Rightmove, Zoopla, your site</div>
-  <div><b>Dundee</b>built here, serving the UK</div>
-</div></div>
-
-<section id="work"><div class="wrap">
-  <div class="kicker">Recent work</div>
-  <h2 class="serif">From floorplan to furnished home.</h2>
-  <p class="sub">Drag the slider on any property. Left is the plan an agent would send us; right is what buyers get back — every room furnished with real scanned furniture, every one walkable. Click through and have a wander.</p>
-  <div class="pf-grid" id="pfGrid"></div>
-  <div class="gallery">
-    <img src="portfolio/perth-bed.jpg" alt="Bedroom render"><img src="portfolio/quay-kitchen.jpg" alt="Kitchen render"><img src="portfolio/monifieth-conservatory.jpg" alt="Conservatory render"><img src="portfolio/barnhill-lounge.jpg" alt="Lounge render">
+<section class="pipe" id="how"><div class="wrap">
+  <div class="kicker reveal">How it works</div>
+  <h2 class="serif reveal">From listing photos to a home you can walk through.</h2>
+  <p class="lede reveal">You already have everything Wander needs. The floor plan gives the geometry. The photographs give the finishes. Wander turns them into a furnished, walkable 3D property.</p>
+  <div class="flow reveal">
+    <div class="stage"><div class="media plan"><span class="num">01 · Input</span><img src="portfolio/perth-road-flat-plan.png" alt="Floor plan"></div><div class="txt"><b>Floor plan + photographs</b><span>The plan and the 10–20 photos already on the listing. Nothing to measure, nothing to scan.</span></div></div>
+    <div class="arrow">→</div>
+    <div class="stage"><div class="media"><span class="num">02 · Wander</span><div class="ai"><div>Reads the floor plan</div><div>Identifies each room</div><div>Matches photos to rooms</div><div>Reconstructs walls, doors, windows</div><div>Places furniture to scale</div><div>Matches materials &amp; colours</div></div></div><div class="txt"><b>Reconstruction</b><span>Geometry from the plan, appearance from the photography, checked by a person before it ships.</span></div></div>
+    <div class="arrow">→</div>
+    <div class="stage"><div class="media"><span class="num">03 · Output</span><img src="portfolio/hero.jpg" alt="Interactive 3D walkthrough"></div><div class="txt"><b>Interactive 3D property</b><span>One link for the listing. Buyers walk room to room on a phone, tablet or laptop — no app.</span></div></div>
   </div>
-  <p style="margin-top:16px;font-size:13px;color:var(--muted)">Sample properties modelled from typical local floorplans to demonstrate the service. Client work is added with permission.</p>
-</div></section>
-
-<section id="how" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)"><div class="wrap">
-  <div class="kicker">How it works</div>
-  <h2 class="serif">You send a link. We do the rest.</h2>
-  <p class="sub">Every walkthrough is built and checked by a person — that's the point. There's no software to learn and nothing to upload into a tool.</p>
-  <div class="steps">
-    <div class="step"><div class="n">01</div><h3>Send the listing</h3><p>Paste the Rightmove or Zoopla link, or email the floorplan and photos. That's the whole brief.</p></div>
-    <div class="step"><div class="n">02</div><h3>We build the home</h3><p>Every room modelled to the plan and furnished to suit. Premium jobs also get photoreal stills and a cinematic tour, rendered in Blender. You approve a private preview.</p></div>
-    <div class="step"><div class="n">03</div><h3>Drop it on the listing</h3><p>One link for the portal, your website, or a WhatsApp to a buyer. Hosted by us, works everywhere, no app needed.</p></div>
-  </div>
-  <div style="margin-top:56px">
-    <h3 style="font-size:20px;font-weight:600;margin:0 0 16px">How it compares</h3>
-    <table class="cmp">
-      <tr><th></th><th>Wander</th><th>360° camera tour</th><th>Photos only</th></tr>
-      <tr><td>Site visit needed</td><td class="y">No</td><td class="n">Yes — book a scanner</td><td class="n">Yes</td></tr>
-      <tr><td>Works from the existing floorplan</td><td class="y">Yes</td><td class="n">No</td><td class="n">—</td></tr>
-      <tr><td>Buyer can walk freely, not hop between dots</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td></tr>
-      <tr><td>Shows an empty / dated home furnished</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td></tr>
-      <tr><td>Typical cost per property</td><td class="y">£89</td><td class="n">£150–300</td><td class="n">—</td></tr>
-      <tr><td>Turnaround</td><td class="y">48 hours</td><td class="n">1–2 weeks</td><td class="n">—</td></tr>
-    </table>
+  <div class="honest reveal">
+    <div><b>Geometry</b><span>Built from the floor plan's dimensions. Room sizes and layout are right.</span></div>
+    <div><b>Appearance</b><span>Matched to the listing photography — floors, walls, kitchen, fittings.</span></div>
+    <div><b>Unseen areas</b><span>Estimated. It's a representation, not a survey, and every walkthrough says so.</span></div>
   </div>
 </div></section>
 
-<section id="pricing"><div class="wrap">
-  <div class="kicker">Pricing</div>
-  <h2 class="serif">One price per property.</h2>
-  <p class="sub">No subscription, no minimum. Your first walkthrough is free — put it on a live listing and see whether buyers use it before you pay a penny.</p>
-  <div class="price">
-    <div class="plan hot">
-      <div class="tag">Walkthrough</div>
-      <div class="amt">£89<small>per property</small></div>
-      <ul><li>Furnished, interactive 3D walkthrough</li><li>Every room modelled to the floorplan</li><li>Real scanned furniture, styled to suit the home</li><li>One link — phone, tablet, laptop</li><li>48-hour turnaround · two rounds of changes</li></ul>
-      <a class="btn" href="#request">Request one</a>
-    </div>
-    <div class="plan">
-      <div class="tag">Premium</div>
-      <div class="amt">£199<small>per property</small></div>
-      <ul><li>Everything in the walkthrough</li><li>Photoreal stills of every room, path-traced in Blender</li><li>30-second cinematic tour video for socials &amp; the listing</li><li>Your agency logo on the walkthrough</li><li>Large / multi-floor homes · unlimited changes</li></ul>
-      <a class="btn light" href="#request">Request one</a>
-    </div>
+<section class="demo" id="demo"><div class="wrap">
+  <div class="kicker reveal">Live example</div>
+  <h2 class="serif reveal">Don't take our word for it.<br>Walk through one.</h2>
+  <p class="lede reveal">A two-bedroom Victorian tenement on Perth Road, Dundee — built from its floor plan alone. Jump between rooms, or just wander.</p>
+  <div class="frame reveal" id="frame">
+    <img src="portfolio/hero.jpg" alt="Living room">
+    <div class="start" id="start"><a class="btn">▶&nbsp; Start walking</a><small>Loads in a few seconds · WASD or drag to explore</small></div>
+  </div>
+  <div class="demo-bar reveal" id="demoBar">
+    <span class="hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move · mouse or drag to look · <kbd>Shift</kbd> run · <kbd>Esc</kbd> release</span>
+  </div>
+</div></section>
+
+<section class="work" id="work"><div class="wrap">
+  <div class="kicker reveal">Recent work</div>
+  <h2 class="serif reveal">Six homes. Hover to see the plan each one came from.</h2>
+  <div class="pf-grid reveal" id="pfGrid"></div>
+  <p style="margin-top:18px;font-size:13px;color:var(--muted)">Sample properties modelled from typical local floor plans. Client work is added with permission.</p>
+</div></section>
+
+<section class="band">
+  <div class="bg"></div><div class="shade"></div>
+  <div class="wrap">
+    <div class="kicker reveal">Why it works</div>
+    <h2 class="serif reveal">Buyers who've already walked through arrive ready to offer.</h2>
+    <p class="reveal">Fewer wasted viewings, more serious ones — and a listing that stands out on a page of identical photo grids. Empty or dated home? Even better: buyers see the potential, not the wallpaper.</p>
+    <a class="btn reveal" href="#request">Try it free on one listing</a>
+  </div>
+</section>
+
+<section class="pricing" id="pricing"><div class="wrap">
+  <div class="kicker reveal">Pricing</div>
+  <h2 class="serif reveal">One price per property.</h2>
+  <p class="lede reveal">No subscription, no minimum. Your first walkthrough is free — put it on a live listing and see whether buyers use it before you pay a penny.</p>
+  <div class="plans reveal">
+    <div class="plan hot"><div class="tag">Walkthrough</div><div class="amt serif">£89<small>per property</small></div>
+      <ul><li>Furnished, interactive 3D walkthrough</li><li>Geometry from the plan, finishes from the photos</li><li>Real scanned furniture, to scale</li><li>One link — phone, tablet, laptop, no app</li><li>48-hour turnaround · two rounds of changes</li></ul>
+      <a class="btn" href="#request">Create a walkthrough</a></div>
+    <div class="plan"><div class="tag">Premium</div><div class="amt serif">£199<small>per property</small></div>
+      <ul><li>Everything in Walkthrough</li><li>Photoreal stills of every room, path-traced in Blender</li><li>30-second cinematic tour video for the listing &amp; socials</li><li>Your agency's branding on the walkthrough</li><li>Large / multi-floor homes · unlimited changes</li></ul>
+      <a class="btn ghost" href="#request">Create a walkthrough</a></div>
   </div>
   <p style="margin-top:16px;font-size:14px;color:var(--muted)">Listing 10+ properties a month? Ask about a flat monthly rate.</p>
 </div></section>
 
-<section style="padding-top:0"><div class="wrap">
-  <div class="quote">
-    <div>
-      <h2 class="serif">Buyers who've already walked through the home turn up ready to make an offer.</h2>
-      <p>Fewer wasted viewings, more serious ones. And a listing that stands out on a page of identical photo grids.</p>
-      <a class="btn" href="#request">Try it free on one listing</a>
-    </div>
-    <img src="portfolio/newport-study.jpg" alt="Rendered study">
-  </div>
+<section class="faq" id="faq"><div class="wrap">
+  <div class="kicker reveal">Questions</div>
+  <h2 class="serif reveal">The things agents ask.</h2>
+  <details open><summary>Is it an exact copy of the house?</summary><p>No, and we don't claim it is. The geometry is built from the floor plan so layout and room sizes are right; finishes are matched to the photography; anything the photos don't show is estimated. Every walkthrough carries that note.</p></details>
+  <details><summary>How do I put it on Rightmove or Zoopla?</summary><p>Paste the link into the listing's virtual-tour field, exactly as you would a 360° tour. It also embeds on your own website and sends fine over WhatsApp.</p></details>
+  <details><summary>What do you need from me?</summary><p>The listing link — or the floor plan image and the photos. Multi-floor homes: one plan per floor.</p></details>
+  <details><summary>Who's behind Wander?</summary><p>It's built in Dundee by a civil engineering student who checks every walkthrough personally before it goes out. Small on purpose — you always deal with the same person.</p></details>
 </div></section>
 
-<section id="faq" style="padding-top:0"><div class="wrap">
-  <div class="kicker">Questions</div>
-  <h2 class="serif" style="margin-bottom:28px">The things agents ask.</h2>
-  <details open><summary>Does it need to be accurate to the millimetre?</summary><p>It's built to the floorplan's dimensions, so room sizes and layout are right. Like any floorplan it's illustrative, not a survey — we say so on every walkthrough.</p></details>
-  <details><summary>The property's empty / dated. Is that a problem?</summary><p>It's the best case. We furnish every room, so buyers see the potential rather than the wallpaper. If you'd rather it matched the current finishes, send the photos and we'll follow them.</p></details>
-  <details><summary>How do I put it on Rightmove?</summary><p>Add the link in the "virtual tour" field of the listing, exactly as you would a 360° tour. It also embeds on your own website and sends fine over WhatsApp.</p></details>
-  <details><summary>What do you need from me?</summary><p>The listing link, or the floorplan image. Photos help with finishes but aren't required. Multi-floor homes: one plan per floor.</p></details>
-  <details><summary>Who's behind this?</summary><p>Wander is run by a civil engineering student at the University of Dundee who builds every walkthrough personally. Small on purpose — you'll always deal with the same person.</p></details>
-</div></section>
-
-<section id="request" style="padding-top:0"><div class="wrap">
-  <div class="req">
+<section class="request" id="request"><div class="wrap">
+  <div class="req reveal">
     <div>
       <div class="kicker">Get started</div>
-      <h2 class="serif">Request a walkthrough</h2>
-      <p style="color:var(--ink2);margin:0 0 18px">Email me the listing — that's the whole brief. I reply personally, usually within a few hours, and nothing is charged until you've approved the preview.</p>
-      <ol><li>Rightmove / Zoopla link (or the floorplan image)</li><li>Which package, and any deadline</li><li>Photos, if you want the finishes matched</li></ol>
-      <a class="btn" id="mailBtn" href="#">Email the listing →</a>
-      <div style="margin-top:12px;font-size:13px;color:var(--muted)">or write to <a id="mailTxt" href="#"></a></div>
+      <h2 class="serif">Create your first walkthrough.</h2>
+      <p>Send the listing link. You'll get a private preview to approve within 48 hours, and nothing is charged until you're happy with it.</p>
+      <a class="btn" id="mailBtn" href="#">Send a listing →</a>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted)">or email <a id="mailTxt" href="#"></a></div>
     </div>
-    <img src="portfolio/quay-kitchen.jpg" alt="Kitchen render" style="width:100%;border-radius:14px;aspect-ratio:4/3;object-fit:cover">
+    <div class="side"><b>What to include</b><div>Rightmove / Zoopla link, or the floor plan</div><div>Listing photographs (optional, for finishes)</div><div>Walkthrough or Premium</div><div>Any deadline</div></div>
   </div>
 </div></section>
 
 <footer><div class="wrap">
   <div>© 2026 Wander · Dundee, Scotland</div>
-  <div class="serif" style="font-style:italic;color:var(--ink2)">Walk through it before you view it.</div>
+  <div class="serif" style="font-style:italic;color:var(--cream2)">See the home before you see the home.</div>
 </div></footer>
 
 <script>
   // ── Change your email here (one place) ──
   const EMAIL = "hello@example.com";
 
-  const props=[["perth-road-flat","Perth Road, West End","2 bed Victorian tenement flat · 78 m²"],["broughty-ferry-semi","Broughty Ferry","3 bed semi-detached · ground floor"],["city-quay-apartment","City Quay","1 bed waterfront apartment · 48 m²"],["newport-detached","Newport-on-Tay","4 bed detached · ground floor"],["monifieth-bungalow","Monifieth","2 bed detached bungalow · 71 m²"],["barnhill-townhouse","Barnhill","New-build 3 bed townhouse"]];
-  document.getElementById('pfGrid').innerHTML=props.map(([k,t,s])=>`<div class="pf"><div class="ba"><img class="after" src="portfolio/${k}-3d.jpg" alt="3D walkthrough of ${t}" loading="lazy"><img class="before" src="portfolio/${k}-plan.png" alt="Floorplan of ${t}" loading="lazy"><div class="knob">⇔</div><input type="range" min="0" max="100" value="50" aria-label="Before / after"><span class="lbl l">Floorplan</span><span class="lbl r">Walkthrough</span></div><div class="pf-meta"><div><b>${t}</b><span>${s}</span></div><a class="btn light sm" href="view.html?p=${k}" target="_blank">Walk through ↗</a></div></div>`).join('');
-  document.querySelectorAll('.ba').forEach(el=>{ const r=el.querySelector('input'), b=el.querySelector('.before'); const set=v=>{ b.style.clipPath=`inset(0 ${100-v}% 0 0)`; el.style.setProperty('--x',v+'%'); }; r.addEventListener('input',()=>set(r.value)); set(50); });
-  // hero: swap still for the live walkthrough on click
-  document.getElementById('heroPlay').onclick=()=>{ const m=document.getElementById('heroMedia'); const f=document.createElement('iframe'); f.src='view.html?p=perth-road-flat&embed=1'; f.allow='pointer-lock'; f.title='Wander live walkthrough'; m.appendChild(f); m.classList.add('live'); };
+  // nav + reveal on scroll
+  const nav=document.getElementById('nav'); addEventListener('scroll',()=>nav.classList.toggle('solid',scrollY>40),{passive:true});
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{ el.style.transitionDelay=(i%4)*70+'ms'; io.observe(el); });
+
+  // demo
+  const rooms=["Living Room","Kitchen","Bedroom 1","Hall","Bedroom 2","Bathroom","Box Room"];
+  const bar=document.getElementById('demoBar'); let frameEl=null;
+  rooms.forEach((r,i)=>{ const b=document.createElement('button'); b.className='pill'; b.textContent=r; b.onclick=()=>{ startDemo(i); document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); b.classList.add('on'); }; bar.insertBefore(b, bar.querySelector('.hint')); });
+  function startDemo(room=0){ const f=document.getElementById('frame'); if(frameEl){ frameEl.contentWindow.postMessage({teleport:room},'*'); return; } frameEl=document.createElement('iframe'); frameEl.src=`view.html?p=perth-road-flat&embed=1&room=${room}`; frameEl.allow='pointer-lock'; frameEl.title='Wander live walkthrough'; f.appendChild(frameEl); f.classList.add('live'); }
+  document.getElementById('start').onclick=()=>startDemo(0);
+
+  // work grid
+  const props=[["perth-road-flat","Perth Road, West End","2 bed Victorian tenement"],["broughty-ferry-semi","Broughty Ferry","3 bed semi-detached"],["city-quay-apartment","City Quay","1 bed waterfront apartment"],["newport-detached","Newport-on-Tay","4 bed detached"],["monifieth-bungalow","Monifieth","2 bed detached bungalow"],["barnhill-townhouse","Barnhill","New-build 3 bed townhouse"]];
+  document.getElementById('pfGrid').innerHTML=props.map(([k,t,s])=>`<a class="pf" href="view.html?p=${k}" target="_blank"><img class="render" src="portfolio/${k}-3d.jpg" alt="${t}" loading="lazy"><img class="plan" src="portfolio/${k}-plan.png" alt="Floor plan of ${t}" loading="lazy"><span class="hov">Floor plan</span><div class="cap"><div><b>${t}</b><span>${s}</span></div><i>Walk through ↗</i></div></a>`).join('');
+
   const subj=encodeURIComponent("Walkthrough request"), body=encodeURIComponent("Hi,\n\nListing link: \nAgency: \nPackage (Walkthrough £89 / Premium £199): \nDeadline (if any): \n\nThanks");
   document.getElementById('mailBtn').href=`mailto:${EMAIL}?subject=${subj}&body=${body}`; document.getElementById('mailTxt').href=`mailto:${EMAIL}`; document.getElementById('mailTxt').textContent=EMAIL;
 </script>

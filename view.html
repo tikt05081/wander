@@ -22,6 +22,9 @@
   #stick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.55)}
   @media(pointer:coarse){#stick{display:block}}
   #brand{position:absolute;right:16px;top:14px;font-size:11px;color:var(--muted);letter-spacing:1px}
+  #map{position:absolute;left:12px;top:60px;width:170px;background:rgba(15,17,21,.75);border:1px solid var(--line);border-radius:12px;padding:8px;backdrop-filter:blur(6px)} #map canvas{width:100%;display:block;border-radius:6px} #map small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+  #hud{position:absolute;right:16px;bottom:16px;font-size:12px;color:#dfe3ec;background:rgba(15,17,21,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(6px)} #hud b{color:#fff}
+  @media(max-width:640px){#map{width:120px;top:54px}}
   #load{position:absolute;inset:0;display:grid;place-items:center;background:#0f1115;color:var(--muted);font-size:14px;z-index:5}
 </style>
 </head>
@@ -31,6 +34,8 @@
   <div id="top"><a class="logo" href="./"><span>W</span>ander</a><div id="title"></div></div>
   <div id="brand">WALKTHROUGH</div>
   <div id="rooms"></div>
+  <div id="map"><small>You are here</small><canvas id="mapc" width="300" height="200"></canvas></div>
+  <div id="hud"><b>W A S D</b> move · drag / mouse look · <b>Shift</b> run</div>
   <div id="stick"><i></i></div>
   <div id="overlay"><div class="card"><h2>Click to walk in</h2><p>W A S D to move · mouse to look · Shift to run · Esc to release</p><div class="t">On a phone: drag to look, use the joystick to move</div></div></div>
   <div id="load">Building the house…</div>
@@ -51,7 +56,19 @@ let iw = project.iw, ih = project.ih;
 if (!iw) { const im = new Image(); im.src = project.planUrl || project.plan; await new Promise(r => im.onload = r); iw = im.width; ih = im.height; }
 const built = await v.load(project.rooms, { startRoom: +(q.get('room')||0), H: +project.wallH || 2.6, mpp: (+project.scale)/iw, iw, ih, quality: q.get('embed') ? 'lite' : 'full' });
 const rb = document.getElementById('rooms'); project.rooms.forEach((r,i) => { const b=document.createElement('button'); b.textContent=r.name; b.onclick=()=>v.teleport(built.roomCentres[i]); rb.appendChild(b); });
+addEventListener('message',e=>{ if(e.data&&typeof e.data.teleport==='number'){ v.teleport(built.roomCentres[e.data.teleport]); } });
 document.getElementById('load').remove();
+// mini-map: rooms drawn to scale, camera dot + heading
+{ const mc=document.getElementById('mapc'), g=mc.getContext('2d'); const rw=project.rooms.map(r=>r.pts.map(p=>({x:p.x*iw*(+project.scale/iw), z:p.y*ih*(+project.scale/iw)})));
+  const xs=rw.flat().map(p=>p.x), zs=rw.flat().map(p=>p.z); const mnx=Math.min(...xs), mxx=Math.max(...xs), mnz=Math.min(...zs), mxz=Math.max(...zs); const pad=10; const s=Math.min((mc.width-2*pad)/(mxx-mnx),(mc.height-2*pad)/(mxz-mnz)); const ox=(mc.width-(mxx-mnx)*s)/2, oz=(mc.height-(mxz-mnz)*s)/2;
+  const X=x=>ox+(x-mnx)*s, Z=z=>oz+(z-mnz)*s; let cur=-1;
+  const inPoly=(p,poly)=>{let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if(((a.z>p.z)!==(b.z>p.z))&&(p.x<(b.x-a.x)*(p.z-a.z)/(b.z-a.z)+a.x))c=!c;}return c;};
+  const draw=()=>{ requestAnimationFrame(draw); g.clearRect(0,0,mc.width,mc.height); const cp={x:v.camera.position.x,z:v.camera.position.z}; cur=rw.findIndex(r=>inPoly(cp,r));
+    rw.forEach((r,i)=>{ g.beginPath(); r.forEach((p,j)=>j?g.lineTo(X(p.x),Z(p.z)):g.moveTo(X(p.x),Z(p.z))); g.closePath(); g.fillStyle=i===cur?'rgba(108,140,255,.55)':'rgba(255,255,255,.14)'; g.fill(); g.strokeStyle='rgba(255,255,255,.7)'; g.lineWidth=1.5; g.stroke(); });
+    const yaw=v.camera.rotation.y; const dx=-Math.sin(yaw), dz=-Math.cos(yaw); g.fillStyle='rgba(255,209,102,.35)'; g.beginPath(); g.moveTo(X(cp.x),Z(cp.z)); g.arc(X(cp.x),Z(cp.z),34,Math.atan2(dz,dx)-0.5,Math.atan2(dz,dx)+0.5); g.closePath(); g.fill();
+    g.fillStyle='#ffd166'; g.beginPath(); g.arc(X(cp.x),Z(cp.z),5,0,7); g.fill(); g.strokeStyle='#1c1a17'; g.lineWidth=1.5; g.stroke();
+    const tl=document.getElementById('title'); if(cur>=0) tl.innerHTML=`${project.title||'Walkthrough'}<small>${project.rooms[cur].name}</small>`; };
+  draw(); }
 if (q.get('still')) { v.pause(true); const img=document.createElement('img'); img.id='still'; img.src=v.screenshot(); document.body.appendChild(img); }
 if (q.get('embed')) overlay.querySelector('h2').textContent = 'Click to walk in';
 // touch joystick
