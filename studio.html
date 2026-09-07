@@ -258,10 +258,10 @@ $('loadFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const r=ne
 
 /* ------------------------------------------------------------------ 3D (shared engine) */
 let scene=null, viewer=null; const threeCv=$('three'), overlay=$('overlay');
-function buildScene(){
+async function buildScene(){
   if(!viewer) viewer=createViewer(threeCv, overlay);
   const scaleM=parseFloat($('scaleM').value)||12, H=parseFloat($('wallH').value)||2.6;
-  const built=viewer.load(state.rooms,{H, mpp:scaleM/state.planImg.width, iw:state.planImg.width, ih:state.planImg.height});
+  const built=await viewer.load(state.rooms,{H, mpp:scaleM/state.planImg.width, iw:state.planImg.width, ih:state.planImg.height});
   scene=true;
   const tp=$('teleport'); tp.innerHTML=''; state.rooms.forEach((r,i)=>{ const b=document.createElement('button'); b.textContent=r.name; b.style.cssText='background:rgba(24,27,34,.85);font-size:12px;padding:6px 10px'; b.onclick=()=>viewer.teleport(built.roomCentres[i]); tp.appendChild(b); });
   viewer.resize();
@@ -276,7 +276,7 @@ function setMode(m){ state.mode=m; $('tabPlan').classList.toggle('active',m==='p
   planCv.style.display=m==='plan'?'block':'none'; threeCv.style.display=m==='walk'?'block':'none'; overlay.style.display=(m==='walk'&&scene)?'flex':'none';
   hint.style.display=m==='plan'?'block':'none'; $('teleport').style.display=m==='walk'?'flex':'none'; if(m==='walk') resize3D(); else { if(controls) controls.unlock(); resizePlan(); } }
 $('tabPlan').onclick=()=>setMode('plan'); $('tabWalk').onclick=()=>{ if(!scene){ hint.textContent='Build first.'; return; } setMode('walk'); };
-$('buildBtn').onclick=()=>{ buildScene(); setMode('walk'); };
+$('buildBtn').onclick=async()=>{ hint.textContent='Building…'; await buildScene(); setMode('walk'); };
 window.addEventListener('resize',()=>{ resizePlan(); resize3D(); });
 resizePlan();
 

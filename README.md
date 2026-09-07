@@ -20,3 +20,13 @@ Static site — no build. Push to GitHub, import into Vercel, done.
 ## Before going live
 - Change `EMAIL` at the bottom of `index.html` to your real address
 - Replace `hello@example.com` with your email
+
+## Premium tier — Blender renders
+`blender/wander_blender.py` builds the same house in Blender (Cycles) with the Poly Haven furniture, one camera per room, and a 30 s tour.
+```
+/Applications/Blender.app/Contents/MacOS/Blender --background --python blender/wander_blender.py -- --project projects/perth-road-flat.json --out renders/perth --stills --samples 64
+```
+Add `--tour` for the video (slow), or `--preview` and open `renders/perth/house.blend` in Blender to look around / tweak before rendering.
+
+## Furniture
+`models/` are CC0 scans from [Poly Haven](https://polyhaven.com) (no attribution required). `models/manifest.json` maps names → files + real-world sizes.

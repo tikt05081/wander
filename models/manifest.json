@@ -1,0 +1,474 @@
+{
+ "files": {
+  "sofa": "models/sofa/sofa_03_1k.gltf",
+  "armchair": "models/armchair/ArmChair_01_1k.gltf",
+  "coffee_table": "models/coffee_table/modern_coffee_table_01_1k.gltf",
+  "side_table": "models/side_table/coffee_table_round_01_1k.gltf",
+  "bed": "models/bed/GothicBed_01_1k.gltf",
+  "nightstand": "models/nightstand/painted_wooden_nightstand_1k.gltf",
+  "wardrobe": "models/wardrobe/painted_wooden_cabinet_1k.gltf",
+  "cabinet": "models/cabinet/modern_wooden_cabinet_1k.gltf",
+  "dining_table": "models/dining_table/dining_table_1k.gltf",
+  "dining_chair": "models/dining_chair/dining_chair_02_1k.gltf",
+  "desk": "models/desk/metal_office_desk_1k.gltf",
+  "stool": "models/stool/metal_stool_01_1k.gltf",
+  "bookshelf": "models/bookshelf/wooden_bookshelf_worn_1k.gltf",
+  "plant": "models/plant/potted_plant_01_1k.gltf",
+  "plant2": "models/plant2/potted_plant_02_1k.gltf",
+  "plant3": "models/plant3/potted_plant_04_1k.gltf",
+  "ceiling_lamp": "models/ceiling_lamp/modern_ceiling_lamp_01_1k.gltf",
+  "pendant": "models/pendant/hanging_industrial_lamp_1k.gltf",
+  "desk_lamp": "models/desk_lamp/desk_lamp_arm_01_1k.gltf",
+  "picture": "models/picture/hanging_picture_frame_01_1k.gltf",
+  "picture2": "models/picture2/hanging_picture_frame_02_1k.gltf",
+  "picture3": "models/picture3/hanging_picture_frame_03_1k.gltf",
+  "mirror": "models/mirror/ornate_mirror_01_1k.gltf",
+  "vase": "models/vase/ceramic_vase_01_1k.gltf",
+  "vase2": "models/vase2/brass_vase_01_1k.gltf",
+  "ottoman": "models/ottoman/Ottoman_01_1k.gltf"
+ },
+ "dims": {
+  "sofa": {
+   "size": [
+    2.731,
+    1.118,
+    0.925
+   ],
+   "min": [
+    -1.366,
+    0.001,
+    -0.464
+   ],
+   "max": [
+    1.366,
+    1.119,
+    0.461
+   ]
+  },
+  "armchair": {
+   "size": [
+    0.848,
+    1.065,
+    0.766
+   ],
+   "min": [
+    -0.424,
+    -0.0,
+    -0.417
+   ],
+   "max": [
+    0.424,
+    1.065,
+    0.348
+   ]
+  },
+  "coffee_table": {
+   "size": [
+    0.6,
+    0.39,
+    1.202
+   ],
+   "min": [
+    -0.3,
+    -0.0,
+    -0.601
+   ],
+   "max": [
+    0.3,
+    0.39,
+    0.601
+   ]
+  },
+  "side_table": {
+   "size": [
+    1.301,
+    0.491,
+    1.301
+   ],
+   "min": [
+    -0.651,
+    -0.001,
+    -0.651
+   ],
+   "max": [
+    0.651,
+    0.49,
+    0.651
+   ]
+  },
+  "bed": {
+   "size": [
+    1.494,
+    1.534,
+    2.04
+   ],
+   "min": [
+    -0.711,
+    -0.0,
+    -1.053
+   ],
+   "max": [
+    0.782,
+    1.534,
+    0.987
+   ]
+  },
+  "nightstand": {
+   "size": [
+    0.505,
+    0.66,
+    0.63
+   ],
+   "min": [
+    -0.253,
+    -0.045,
+    -0.376
+   ],
+   "max": [
+    0.251,
+    0.616,
+    0.254
+   ]
+  },
+  "wardrobe": {
+   "size": [
+    1.195,
+    1.561,
+    0.644
+   ],
+   "min": [
+    -0.595,
+    -0.379,
+    -0.38
+   ],
+   "max": [
+    0.6,
+    1.181,
+    0.264
+   ]
+  },
+  "cabinet": {
+   "size": [
+    2.44,
+    0.68,
+    0.684
+   ],
+   "min": [
+    -1.22,
+    -0.0,
+    -0.342
+   ],
+   "max": [
+    1.22,
+    0.68,
+    0.342
+   ]
+  },
+  "dining_table": {
+   "size": [
+    2.256,
+    0.877,
+    1.39
+   ],
+   "min": [
+    -1.133,
+    -0.004,
+    -0.678
+   ],
+   "max": [
+    1.123,
+    0.873,
+    0.712
+   ]
+  },
+  "dining_chair": {
+   "size": [
+    0.434,
+    0.973,
+    0.576
+   ],
+   "min": [
+    -0.217,
+    0.001,
+    -0.331
+   ],
+   "max": [
+    0.217,
+    0.975,
+    0.245
+   ]
+  },
+  "desk": {
+   "size": [
+    2.0,
+    0.788,
+    0.947
+   ],
+   "min": [
+    -1.0,
+    0.0,
+    -0.469
+   ],
+   "max": [
+    1.0,
+    0.788,
+    0.478
+   ]
+  },
+  "stool": {
+   "size": [
+    0.352,
+    0.883,
+    0.355
+   ],
+   "min": [
+    -0.176,
+    0.0,
+    -0.177
+   ],
+   "max": [
+    0.176,
+    0.883,
+    0.177
+   ]
+  },
+  "bookshelf": {
+   "size": [
+    1.374,
+    2.063,
+    0.581
+   ],
+   "min": [
+    -0.687,
+    -0.0,
+    -0.291
+   ],
+   "max": [
+    0.687,
+    2.063,
+    0.291
+   ]
+  },
+  "plant": {
+   "size": [
+    0.587,
+    1.336,
+    0.634
+   ],
+   "min": [
+    -0.338,
+    0.0,
+    -0.364
+   ],
+   "max": [
+    0.249,
+    1.336,
+    0.27
+   ]
+  },
+  "plant2": {
+   "size": [
+    0.729,
+    0.633,
+    0.757
+   ],
+   "min": [
+    -0.394,
+    -0.097,
+    -0.421
+   ],
+   "max": [
+    0.335,
+    0.536,
+    0.336
+   ]
+  },
+  "plant3": {
+   "size": [
+    0.168,
+    0.267,
+    0.185
+   ],
+   "min": [
+    -0.084,
+    0.0,
+    -0.084
+   ],
+   "max": [
+    0.084,
+    0.268,
+    0.101
+   ]
+  },
+  "ceiling_lamp": {
+   "size": [
+    0.432,
+    0.952,
+    0.432
+   ],
+   "min": [
+    -0.216,
+    0.221,
+    -0.214
+   ],
+   "max": [
+    0.216,
+    1.173,
+    0.217
+   ]
+  },
+  "pendant": {
+   "size": [
+    0.55,
+    1.355,
+    0.55
+   ],
+   "min": [
+    -0.275,
+    -1.34,
+    -0.275
+   ],
+   "max": [
+    0.275,
+    0.015,
+    0.275
+   ]
+  },
+  "desk_lamp": {
+   "size": [
+    0.202,
+    0.893,
+    0.614
+   ],
+   "min": [
+    -0.118,
+    -0.088,
+    -0.297
+   ],
+   "max": [
+    0.083,
+    0.805,
+    0.317
+   ]
+  },
+  "picture": {
+   "size": [
+    0.594,
+    0.841,
+    0.016
+   ],
+   "min": [
+    -0.297,
+    -0.42,
+    0.0
+   ],
+   "max": [
+    0.297,
+    0.42,
+    0.016
+   ]
+  },
+  "picture2": {
+   "size": [
+    0.752,
+    0.5,
+    0.033
+   ],
+   "min": [
+    -0.376,
+    -0.279,
+    0.002
+   ],
+   "max": [
+    0.376,
+    0.221,
+    0.035
+   ]
+  },
+  "picture3": {
+   "size": [
+    0.385,
+    0.502,
+    0.032
+   ],
+   "min": [
+    -0.193,
+    -0.255,
+    -0.032
+   ],
+   "max": [
+    0.192,
+    0.247,
+    -0.0
+   ]
+  },
+  "mirror": {
+   "size": [
+    0.486,
+    0.744,
+    0.026
+   ],
+   "min": [
+    -0.243,
+    -0.411,
+    0.0
+   ],
+   "max": [
+    0.243,
+    0.333,
+    0.026
+   ]
+  },
+  "vase": {
+   "size": [
+    0.204,
+    0.4,
+    0.204
+   ],
+   "min": [
+    -0.102,
+    0.001,
+    -0.102
+   ],
+   "max": [
+    0.102,
+    0.401,
+    0.102
+   ]
+  },
+  "vase2": {
+   "size": [
+    0.227,
+    0.692,
+    0.227
+   ],
+   "min": [
+    -0.114,
+    0.001,
+    -0.114
+   ],
+   "max": [
+    0.114,
+    0.694,
+    0.114
+   ]
+  },
+  "ottoman": {
+   "size": [
+    0.885,
+    0.624,
+    0.621
+   ],
+   "min": [
+    -0.44,
+    -0.0,
+    -0.31
+   ],
+   "max": [
+    0.444,
+    0.624,
+    0.311
+   ]
+  }
+ }
+}
