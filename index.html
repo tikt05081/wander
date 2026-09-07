@@ -260,7 +260,7 @@
   const rooms=["Living Room","Kitchen","Bedroom 1","Hall","Bedroom 2","Bathroom","Box Room"];
   const bar=document.getElementById('demoBar'); let frameEl=null;
   rooms.forEach((r,i)=>{ const b=document.createElement('button'); b.className='pill'; b.textContent=r; b.onclick=()=>{ startDemo(i); document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); b.classList.add('on'); }; bar.insertBefore(b, bar.querySelector('.hint')); });
-  function startDemo(room=0){ const f=document.getElementById('frame'); if(frameEl){ frameEl.contentWindow.postMessage({teleport:room},'*'); return; } frameEl=document.createElement('iframe'); frameEl.src=`view.html?v=654c357&p=perth-road-flat&embed=1&room=${room}`; frameEl.allow='pointer-lock'; frameEl.title='Wander live walkthrough'; f.appendChild(frameEl); f.classList.add('live'); }
+  function startDemo(room=0){ const f=document.getElementById('frame'); if(frameEl){ frameEl.contentWindow.postMessage({teleport:room},'*'); return; } frameEl=document.createElement('iframe'); frameEl.src=`view.html?v=0671f98&p=perth-road-flat&embed=1&room=${room}`; frameEl.allow='pointer-lock'; frameEl.title='Wander live walkthrough'; f.appendChild(frameEl); f.classList.add('live'); }
   document.getElementById('start').onclick=()=>startDemo(0);
   document.getElementById('dollBtn').onclick=()=>{ if(!frameEl){ startDemo(0); setTimeout(()=>frameEl.contentWindow.postMessage({dollhouse:true},'*'),2500); } else frameEl.contentWindow.postMessage({dollhouse:'toggle'},'*'); document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); };
 

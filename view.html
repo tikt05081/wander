@@ -54,7 +54,7 @@
   <div id="load">Building the house…</div>
 </div>
 <script type="module">
-import { createViewer } from './lib/wander-engine.js?v=654c357';
+import { createViewer, texturesReady } from './lib/wander-engine.js?v=0671f98';
 const q = new URLSearchParams(location.search);
 const src = q.get('p') ? `projects/${q.get('p')}.json` : null;
 const overlay = document.getElementById('overlay');
@@ -70,7 +70,7 @@ if (!iw) { const im = new Image(); im.src = project.planUrl || project.plan; awa
 const built = await v.load(project.rooms, { startRoom: +(q.get('room')||0), H: +project.wallH || 2.6, mpp: (+project.scale)/iw, iw, ih, quality: q.get('embed') ? 'lite' : 'full' });
 const rb = document.getElementById('rooms'); const roomBtns = project.rooms.map((r,i) => { const b=document.createElement('button'); b.innerHTML=`<span>${r.name}</span>`; b.onclick=()=>goRoom(i); rb.appendChild(b); return b; });
 let curRoom = +(q.get('room')||0);
-function goRoom(i, instant){ curRoom=(i+project.rooms.length)%project.rooms.length; instant ? v.teleport(built.roomCentres[curRoom]) : v.glideTo(built.roomCentres[curRoom]); document.getElementById('bDoll').classList.remove('on'); }
+function goRoom(i, instant){ curRoom=(i+project.rooms.length)%project.rooms.length; instant ? v.teleport(curRoom) : v.glideTo(curRoom); document.getElementById('bDoll').classList.remove('on'); }
 addEventListener('message',e=>{ if(e.data&&typeof e.data.teleport==='number'){ goRoom(e.data.teleport); } if(e.data&&e.data.dollhouse!==undefined){ toggleDoll(e.data.dollhouse==='toggle'?undefined:e.data.dollhouse); } });
 function toggleDoll(on){ const d=v.dollhouse(on); document.getElementById('bDoll').classList.toggle('on',d); }
 document.getElementById('bPrev').onclick=()=>goRoom(curRoom-1);
@@ -78,7 +78,7 @@ document.getElementById('bNext').onclick=()=>goRoom(curRoom+1);
 document.getElementById('bDoll').onclick=()=>toggleDoll();
 document.getElementById('bFull').onclick=()=>{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
 // room thumbnails: quick offscreen snapshots from each room centre after first paint
-if (!q.get('still')) setTimeout(()=>{ const savedP=v.camera.position.clone(), savedR=v.camera.rotation.clone(); project.rooms.forEach((r,i)=>{ v.teleport(built.roomCentres[i]); v.camera.rotation.set(-0.05, (built.orient[i]||{back:0}).back*Math.PI/2 + Math.PI, 0); roomBtns[i].style.backgroundImage=`url(${v.thumb()})`; }); v.camera.position.copy(savedP); v.camera.rotation.copy(savedR); }, 400);
+if (!q.get('still')) setTimeout(()=>{ const savedP=v.camera.position.clone(), savedR=v.camera.rotation.clone(); project.rooms.forEach((r,i)=>{ v.teleport(i); roomBtns[i].style.backgroundImage=`url(${v.thumb()})`; }); v.camera.position.copy(savedP); v.camera.rotation.copy(savedR); }, 400);
 document.getElementById('load').remove();
 // mini-map: rooms drawn to scale, camera dot + heading
 { const mc=document.getElementById('mapc'), g=mc.getContext('2d'); const rw=project.rooms.map(r=>r.pts.map(p=>({x:p.x*iw*(+project.scale/iw), z:p.y*ih*(+project.scale/iw)})));
@@ -92,7 +92,7 @@ document.getElementById('load').remove();
     const tl=document.getElementById('title'); if(cur>=0){ tl.innerHTML=`${project.title||'Walkthrough'}<small>${project.rooms[cur].name}</small>`; roomBtns.forEach((b,i)=>b.classList.toggle('on',i===cur)); } };
   draw(); }
 if (q.get('view')==='dollhouse') { toggleDoll(true); }
-if (q.get('still')) { v.pause(true); const img=document.createElement('img'); img.id='still'; img.src=v.screenshot(); document.body.appendChild(img); }
+if (q.get('still')) { await texturesReady(); await new Promise(r=>setTimeout(r,300)); v.pause(true); const img=document.createElement('img'); img.id='still'; img.src=v.screenshot(); document.body.appendChild(img); }
 if (q.get('embed')) overlay.querySelector('h2').textContent = 'Click to walk in';
 // touch joystick
 const st=document.getElementById('stick'), knob=st.querySelector('i'); let sid=null;
