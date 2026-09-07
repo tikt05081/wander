@@ -5,33 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Wander walkthrough</title>
 <style>
-  :root{--line:#2a2f3a;--muted:#9aa2b5}
-  *{box-sizing:border-box} html,body{margin:0;height:100%;background:#0f1115;color:#eef0f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;overflow:hidden}
+  :root{--line:#23252a;--muted:#8a8f98}
+  *{box-sizing:border-box} html,body{margin:0;height:100%;background:#08090a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,"Segoe UI",sans-serif;letter-spacing:-.01em;overflow:hidden}
   #stage{position:fixed;inset:0} canvas{display:block;width:100%;height:100%}
   #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,18,.55);cursor:pointer;backdrop-filter:blur(2px)}
-  #overlay .card{text-align:center;padding:26px 34px;border-radius:16px;background:rgba(15,17,21,.85);border:1px solid var(--line)}
+  #overlay .card{text-align:center;padding:26px 34px;border-radius:16px;background:rgba(8,9,10,.85);border:1px solid var(--line)}
   #overlay h2{margin:0 0 4px;font-size:22px} #overlay p{margin:0;color:var(--muted);font-size:14px} #overlay .t{margin-top:10px;font-size:12px;color:var(--muted)}
   #top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(rgba(10,12,18,.75),transparent);pointer-events:none}
   #top *{pointer-events:auto}
-  .logo{font-weight:700;font-size:16px;text-decoration:none;color:#fff} .logo span{color:#6c8cff}
+  .logo{font-weight:700;font-size:16px;text-decoration:none;color:#fff} .logo span{color:#fff}
   #title{font-size:14px;color:#dfe3ec} #title small{color:var(--muted);margin-left:8px}
-  #rooms{position:absolute;right:14px;top:56px;bottom:84px;width:132px;display:flex;flex-direction:column;gap:8px;padding:8px;overflow:auto;background:rgba(15,17,21,.6);border:1px solid rgba(255,255,255,.1);border-radius:16px;backdrop-filter:blur(10px);scrollbar-width:none}
+  #rooms{position:absolute;right:14px;top:56px;bottom:84px;width:132px;display:flex;flex-direction:column;gap:8px;padding:8px;overflow:auto;background:rgba(8,9,10,.6);border:1px solid rgba(255,255,255,.1);border-radius:16px;backdrop-filter:blur(10px);scrollbar-width:none}
   #rooms::-webkit-scrollbar{display:none}
   #rooms button{position:relative;flex:0 0 auto;height:72px;border-radius:11px;border:2px solid transparent;background:#1b1e26 center/cover no-repeat;color:#fff;font-size:12px;font-weight:500;cursor:pointer;text-align:left;padding:0;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,.8)}
   #rooms button span{position:absolute;left:8px;bottom:6px;right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #rooms button::before{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.6))}
-  #rooms button:hover{border-color:rgba(255,255,255,.45)} #rooms button.on{border-color:#6c8cff}
-  #bar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:4px;padding:6px;background:rgba(15,17,21,.75);border:1px solid rgba(255,255,255,.12);border-radius:999px;backdrop-filter:blur(10px)}
+  #rooms button:hover{border-color:rgba(255,255,255,.45)} #rooms button.on{border-color:#ffffff}
+  #bar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:4px;padding:6px;background:rgba(8,9,10,.75);border:1px solid rgba(255,255,255,.12);border-radius:999px;backdrop-filter:blur(10px)}
   #bar button{width:42px;height:42px;border-radius:50%;border:0;background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center} #bar button:hover,#bar button.on{background:rgba(255,255,255,.12)} #bar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   #tip{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);font-size:11px;color:var(--muted);letter-spacing:.04em;pointer-events:none}
   #stick{position:absolute;right:22px;bottom:22px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:none;touch-action:none}
   #stick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.55)}
   @media(pointer:coarse){#stick{display:block}}
   #brand{position:absolute;right:16px;top:14px;font-size:11px;color:var(--muted);letter-spacing:1px}
-  #map{position:absolute;left:14px;bottom:18px;width:170px;background:rgba(15,17,21,.75);border:1px solid var(--line);border-radius:12px;padding:8px;backdrop-filter:blur(6px)} #map canvas{width:100%;display:block;border-radius:6px} #map small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
-  #hud{display:none;position:absolute;right:16px;bottom:16px;font-size:12px;color:#dfe3ec;background:rgba(15,17,21,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(6px)} #hud b{color:#fff}
+  #map{position:absolute;left:14px;bottom:18px;width:170px;background:rgba(8,9,10,.75);border:1px solid var(--line);border-radius:12px;padding:8px;backdrop-filter:blur(6px)} #map canvas{width:100%;display:block;border-radius:6px} #map small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+  #hud{display:none;position:absolute;right:16px;bottom:16px;font-size:12px;color:#dfe3ec;background:rgba(8,9,10,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(6px)} #hud b{color:#fff}
   @media(max-width:640px){#map{width:110px;bottom:78px}#rooms{display:none}#stick{right:14px;bottom:78px}}
-  #load{position:absolute;inset:0;display:grid;place-items:center;background:#0f1115;color:var(--muted);font-size:14px;z-index:5}
+  #load{position:absolute;inset:0;display:grid;place-items:center;background:#08090a;color:var(--muted);font-size:14px;z-index:5}
 </style>
 </head>
 <body>
@@ -86,7 +86,7 @@ document.getElementById('load').remove();
   const X=x=>ox+(x-mnx)*s, Z=z=>oz+(z-mnz)*s; let cur=-1;
   const inPoly=(p,poly)=>{let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if(((a.z>p.z)!==(b.z>p.z))&&(p.x<(b.x-a.x)*(p.z-a.z)/(b.z-a.z)+a.x))c=!c;}return c;};
   const draw=()=>{ requestAnimationFrame(draw); g.clearRect(0,0,mc.width,mc.height); const cp={x:v.camera.position.x,z:v.camera.position.z}; cur=rw.findIndex(r=>inPoly(cp,r));
-    rw.forEach((r,i)=>{ g.beginPath(); r.forEach((p,j)=>j?g.lineTo(X(p.x),Z(p.z)):g.moveTo(X(p.x),Z(p.z))); g.closePath(); g.fillStyle=i===cur?'rgba(108,140,255,.55)':'rgba(255,255,255,.14)'; g.fill(); g.strokeStyle='rgba(255,255,255,.7)'; g.lineWidth=1.5; g.stroke(); });
+    rw.forEach((r,i)=>{ g.beginPath(); r.forEach((p,j)=>j?g.lineTo(X(p.x),Z(p.z)):g.moveTo(X(p.x),Z(p.z))); g.closePath(); g.fillStyle=i===cur?'rgba(255,255,255,.55)':'rgba(255,255,255,.14)'; g.fill(); g.strokeStyle='rgba(255,255,255,.7)'; g.lineWidth=1.5; g.stroke(); });
     const yaw=v.camera.rotation.y; const dx=-Math.sin(yaw), dz=-Math.cos(yaw); g.fillStyle='rgba(255,209,102,.35)'; g.beginPath(); g.moveTo(X(cp.x),Z(cp.z)); g.arc(X(cp.x),Z(cp.z),34,Math.atan2(dz,dx)-0.5,Math.atan2(dz,dx)+0.5); g.closePath(); g.fill();
     g.fillStyle='#ffd166'; g.beginPath(); g.arc(X(cp.x),Z(cp.z),5,0,7); g.fill(); g.strokeStyle='#1c1a17'; g.lineWidth=1.5; g.stroke();
     const tl=document.getElementById('title'); if(cur>=0){ tl.innerHTML=`${project.title||'Walkthrough'}<small>${project.rooms[cur].name}</small>`; roomBtns.forEach((b,i)=>b.classList.toggle('on',i===cur)); } };
