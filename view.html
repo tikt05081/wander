@@ -49,7 +49,7 @@ document.getElementById('title').innerHTML = `${project.title||'Walkthrough'}<sm
 // image size is needed for scale; load the plan image (or use stored dims)
 let iw = project.iw, ih = project.ih;
 if (!iw) { const im = new Image(); im.src = project.planUrl || project.plan; await new Promise(r => im.onload = r); iw = im.width; ih = im.height; }
-const built = await v.load(project.rooms, { H: +project.wallH || 2.6, mpp: (+project.scale)/iw, iw, ih, quality: q.get('embed') ? 'lite' : 'full' });
+const built = await v.load(project.rooms, { startRoom: +(q.get('room')||0), H: +project.wallH || 2.6, mpp: (+project.scale)/iw, iw, ih, quality: q.get('embed') ? 'lite' : 'full' });
 const rb = document.getElementById('rooms'); project.rooms.forEach((r,i) => { const b=document.createElement('button'); b.textContent=r.name; b.onclick=()=>v.teleport(built.roomCentres[i]); rb.appendChild(b); });
 document.getElementById('load').remove();
 if (q.get('still')) { v.pause(true); const img=document.createElement('img'); img.id='still'; img.src=v.screenshot(); document.body.appendChild(img); }

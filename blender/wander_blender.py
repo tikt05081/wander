@@ -279,7 +279,7 @@ def furnish(rtype, cx, cy, w, d, ang):
         for s in (-1, 1):
             B("Pillow", (bw*0.42, 0.4, 0.14), s*bw*0.25, back+0.5, 0.62, 0, M["white"])
             if w > bw+1.2: A("nightstand", s*(bw/2+0.4), back+0.32, 0, w=0.5); A("vase", s*(bw/2+0.4), back+0.32, 0, h=0.3, z=0.62); light(s*(bw/2+0.4), back+0.32, 0.9, 10)
-        if w > 3.2: A("wardrobe", right-0.35, 0.4, -math.pi/2, h=2.1)
+        if w > 3.2: A("wardrobe", right-0.35, 0.4, -math.pi/2, h=1.9, z=0)
         if mid: A("plant", left+0.4, front-0.5, 0, h=1.2)
         A("picture3", 0.3, back+0.09, 0, z=1.75)
     elif rtype == "kitchen":
