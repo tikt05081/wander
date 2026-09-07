@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wander — see the home before you see the home</title>
+<title>Wander. See the home before you see the home</title>
 <meta name="description" content="Wander turns a property's floor plan and listing photographs into an interactive 3D walkthrough buyers can explore from any device.">
-<meta property="og:title" content="Wander — see the home before you see the home">
+<meta property="og:title" content="Wander. See the home before you see the home">
 <meta property="og:description" content="Floor plan + photographs → interactive 3D property. From £89.">
 <meta property="og:image" content="https://wander-gamma.vercel.app/portfolio/brand-hero.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230e0d0c'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23f4efe6' font-family='Georgia'>W</text></svg>">
@@ -85,16 +85,16 @@
   /* work */
   .work{padding:60px 0 110px}
   .work h2{font-size:clamp(32px,4vw,56px);line-height:1.02;margin:14px 0 40px}
-  .pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .pf{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);border:1px solid var(--line);text-decoration:none;display:block;aspect-ratio:4/3}
-  .pf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
-  .pf img.plan{object-fit:contain;background:#f4efe6;padding:10px;opacity:0;transition:opacity .4s}
-  .pf:hover img.render{transform:scale(1.05)}
-  .pf:hover img.plan,.pf:hover .hov{opacity:1}
-  .pf .cap{position:absolute;left:0;right:0;bottom:0;padding:18px;background:linear-gradient(transparent,rgba(14,13,12,.85));display:flex;justify-content:space-between;align-items:end}
-  .pf .cap b{display:block;font-size:16px}.pf .cap span{font-size:12px;color:var(--cream2)}
+  .pf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .pf{position:relative;border-radius:22px;overflow:hidden;background:#dfe8d4;border:1px solid var(--line);text-decoration:none;display:grid;grid-template-columns:1fr 1.25fr;aspect-ratio:2/1;color:var(--cream)}
+  .pf img{width:100%;height:100%;object-fit:cover;transition:transform .8s ease;display:block}
+  .pf img.plan{object-fit:contain;background:#f4efe6;padding:22px;filter:sepia(.15)}
+  .pf:hover img.render{transform:scale(1.06)}
+  .pf .mid{position:absolute;left:calc(44.4% - 18px);top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:var(--bg);color:var(--gold);display:grid;place-items:center;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  .pf .cap{position:absolute;left:44.4%;right:0;bottom:0;padding:18px;background:linear-gradient(transparent,rgba(14,13,12,.85));display:flex;justify-content:space-between;align-items:end}
+  .pf .cap b{display:block;font-size:16px;color:#fff}.pf .cap span{font-size:12px;color:var(--cream2)}
   .pf .cap i{font-style:normal;font-size:12px;border:1px solid rgba(244,239,230,.35);padding:7px 11px;border-radius:999px;white-space:nowrap}
-  .pf .hov{opacity:0;transition:opacity .3s;position:absolute;top:14px;left:14px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:rgba(14,13,12,.7);padding:6px 10px;border-radius:999px}
+  .pf .hov{position:absolute;top:14px;left:14px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:rgba(14,13,12,.7);padding:6px 10px;border-radius:999px}
   /* full-bleed image band */
   .band{position:relative;min-height:70svh;display:flex;align-items:center;overflow:hidden}
   .band .bg{position:absolute;inset:0;background:url(portfolio/brand-kitchen.jpg) center/cover;}
@@ -123,7 +123,7 @@
   details{border-bottom:1px solid var(--line);padding:20px 0}
   summary{cursor:pointer;font-size:18px;list-style:none;display:flex;justify-content:space-between;align-items:center}
   summary::after{content:"+";color:var(--muted);font-size:24px}
-  details[open] summary::after{content:"–"}
+  details[open] summary::after{content:"×"}
   details p{margin:12px 0 0;color:var(--cream2);max-width:72ch;font-size:15px}
   .request{padding:0 0 120px}
   .req{border:1px solid var(--line);border-radius:28px;padding:64px;background:radial-gradient(90% 100% at 100% 0%,rgba(217,180,106,.12),transparent 55%),var(--bg2);display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
@@ -134,7 +134,7 @@
   .req .side div{padding:6px 0}
   footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
-  @media(max-width:960px){.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg);justify-self:center}.honest,.pf-grid,.plans,.req{grid-template-columns:1fr}nav .links{display:none}.req{padding:36px}.req .side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:20px}}
+  @media(max-width:960px){.pf-grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg);justify-self:center}.honest,.pf-grid,.plans,.req{grid-template-columns:1fr}nav .links{display:none}.req{padding:36px}.req .side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:20px}}
 </style>
 </head>
 <body>
@@ -159,15 +159,15 @@
   <h2 class="serif reveal">From listing photos to a home you can walk through.</h2>
   <p class="lede reveal">You already have everything Wander needs. The floor plan gives the geometry. The photographs give the finishes. Wander turns them into a furnished, walkable 3D property.</p>
   <div class="flow reveal">
-    <div class="stage"><div class="media plan"><span class="num">01 · Input</span><img src="portfolio/perth-road-flat-plan.png" alt="Floor plan"></div><div class="txt"><b>Floor plan + photographs</b><span>The plan and the 10–20 photos already on the listing. Nothing to measure, nothing to scan.</span></div></div>
+    <div class="stage"><div class="media plan"><span class="num">01 · Input</span><img src="portfolio/perth-road-flat-plan.png" alt="Floor plan"></div><div class="txt"><b>Floor plan + photographs</b><span>The plan and the 10 to 20 photos already on the listing. Nothing to measure, nothing to scan.</span></div></div>
     <div class="arrow">→</div>
     <div class="stage"><div class="media"><span class="num">02 · Wander</span><div class="ai"><div>Reads the floor plan</div><div>Identifies each room</div><div>Matches photos to rooms</div><div>Reconstructs walls, doors, windows</div><div>Places furniture to scale</div><div>Matches materials &amp; colours</div></div></div><div class="txt"><b>Reconstruction</b><span>Geometry from the plan, appearance from the photography, checked by a person before it ships.</span></div></div>
     <div class="arrow">→</div>
-    <div class="stage"><div class="media"><span class="num">03 · Output</span><img src="portfolio/hero.jpg" alt="Interactive 3D walkthrough"></div><div class="txt"><b>Interactive 3D property</b><span>One link for the listing. Buyers walk room to room on a phone, tablet or laptop — no app.</span></div></div>
+    <div class="stage"><div class="media"><span class="num">03 · Output</span><img src="portfolio/perth-road-flat-doll.jpg" alt="Interactive 3D property, dollhouse view"></div><div class="txt"><b>Interactive 3D property</b><span>One link for the listing. Buyers walk room to room on a phone, tablet or laptop. No app.</span></div></div>
   </div>
   <div class="honest reveal">
     <div><b>Geometry</b><span>Built from the floor plan's dimensions. Room sizes and layout are right.</span></div>
-    <div><b>Appearance</b><span>Matched to the listing photography — floors, walls, kitchen, fittings.</span></div>
+    <div><b>Appearance</b><span>Matched to the listing photography: floors, walls, kitchen, fittings.</span></div>
     <div><b>Unseen areas</b><span>Estimated. It's a representation, not a survey, and every walkthrough says so.</span></div>
   </div>
 </div></section>
@@ -175,19 +175,19 @@
 <section class="demo" id="demo"><div class="wrap">
   <div class="kicker reveal">Live example</div>
   <h2 class="serif reveal">Don't take our word for it.<br>Walk through one.</h2>
-  <p class="lede reveal">A two-bedroom Victorian tenement on Perth Road, Dundee — built from its floor plan alone. Jump between rooms, or just wander.</p>
+  <p class="lede reveal">A two bedroom Victorian tenement on Perth Road, Dundee, built from its floor plan alone. Jump between rooms, open the dollhouse view, or just wander.</p>
   <div class="frame reveal" id="frame">
     <img src="portfolio/hero.jpg" alt="Living room">
     <div class="start" id="start"><a class="btn">▶&nbsp; Start walking</a><small>Loads in a few seconds · WASD or drag to explore</small></div>
   </div>
   <div class="demo-bar reveal" id="demoBar">
-    <span class="hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move · mouse or drag to look · <kbd>Shift</kbd> run · <kbd>Esc</kbd> release</span>
+    <button class="pill doll" id="dollBtn">◇ Dollhouse</button><span class="hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move · mouse or drag to look · <kbd>Shift</kbd> run · <kbd>Esc</kbd> release</span>
   </div>
 </div></section>
 
 <section class="work" id="work"><div class="wrap">
   <div class="kicker reveal">Recent work</div>
-  <h2 class="serif reveal">Six homes. Hover to see the plan each one came from.</h2>
+  <h2 class="serif reveal">Six homes. The plan it came from, and the home it became.</h2>
   <div class="pf-grid reveal" id="pfGrid"></div>
   <p style="margin-top:18px;font-size:13px;color:var(--muted)">Sample properties modelled from typical local floor plans. Client work is added with permission.</p>
 </div></section>
@@ -197,7 +197,7 @@
   <div class="wrap">
     <div class="kicker reveal">Why it works</div>
     <h2 class="serif reveal">Buyers who've already walked through arrive ready to offer.</h2>
-    <p class="reveal">Fewer wasted viewings, more serious ones — and a listing that stands out on a page of identical photo grids. Empty or dated home? Even better: buyers see the potential, not the wallpaper.</p>
+    <p class="reveal">Fewer wasted viewings, more serious ones, and a listing that stands out on a page of identical photo grids. Empty or dated home? Even better: buyers see the potential, not the wallpaper.</p>
     <a class="btn reveal" href="#request">Try it free on one listing</a>
   </div>
 </section>
@@ -205,13 +205,13 @@
 <section class="pricing" id="pricing"><div class="wrap">
   <div class="kicker reveal">Pricing</div>
   <h2 class="serif reveal">One price per property.</h2>
-  <p class="lede reveal">No subscription, no minimum. Your first walkthrough is free — put it on a live listing and see whether buyers use it before you pay a penny.</p>
+  <p class="lede reveal">No subscription, no minimum. Your first walkthrough is free. Put it on a live listing and see whether buyers use it before you pay a penny.</p>
   <div class="plans reveal">
     <div class="plan hot"><div class="tag">Walkthrough</div><div class="amt serif">£89<small>per property</small></div>
-      <ul><li>Furnished, interactive 3D walkthrough</li><li>Geometry from the plan, finishes from the photos</li><li>Real scanned furniture, to scale</li><li>One link — phone, tablet, laptop, no app</li><li>48-hour turnaround · two rounds of changes</li></ul>
+      <ul><li>Furnished, interactive 3D walkthrough</li><li>Geometry from the plan, finishes from the photos</li><li>Real scanned furniture, to scale</li><li>One link for phone, tablet and laptop, no app</li><li>48 hour turnaround · two rounds of changes</li></ul>
       <a class="btn" href="#request">Create a walkthrough</a></div>
     <div class="plan"><div class="tag">Premium</div><div class="amt serif">£199<small>per property</small></div>
-      <ul><li>Everything in Walkthrough</li><li>Photoreal stills of every room, path-traced in Blender</li><li>30-second cinematic tour video for the listing &amp; socials</li><li>Your agency's branding on the walkthrough</li><li>Large / multi-floor homes · unlimited changes</li></ul>
+      <ul><li>Everything in Walkthrough</li><li>Photoreal stills of every room, path-traced in Blender</li><li>30 second cinematic tour video for the listing &amp; socials</li><li>Your agency's branding on the walkthrough</li><li>Large and multi floor homes · unlimited changes</li></ul>
       <a class="btn ghost" href="#request">Create a walkthrough</a></div>
   </div>
   <p style="margin-top:16px;font-size:14px;color:var(--muted)">Listing 10+ properties a month? Ask about a flat monthly rate.</p>
@@ -221,9 +221,9 @@
   <div class="kicker reveal">Questions</div>
   <h2 class="serif reveal">The things agents ask.</h2>
   <details open><summary>Is it an exact copy of the house?</summary><p>No, and we don't claim it is. The geometry is built from the floor plan so layout and room sizes are right; finishes are matched to the photography; anything the photos don't show is estimated. Every walkthrough carries that note.</p></details>
-  <details><summary>How do I put it on Rightmove or Zoopla?</summary><p>Paste the link into the listing's virtual-tour field, exactly as you would a 360° tour. It also embeds on your own website and sends fine over WhatsApp.</p></details>
-  <details><summary>What do you need from me?</summary><p>The listing link — or the floor plan image and the photos. Multi-floor homes: one plan per floor.</p></details>
-  <details><summary>Who's behind Wander?</summary><p>It's built in Dundee by a civil engineering student who checks every walkthrough personally before it goes out. Small on purpose — you always deal with the same person.</p></details>
+  <details><summary>How do I put it on Rightmove or Zoopla?</summary><p>Paste the link into the listing's virtual tour field, exactly as you would a 360° tour. It also embeds on your own website and sends fine over WhatsApp.</p></details>
+  <details><summary>What do you need from me?</summary><p>The listing link, or the floor plan image and the photos. Multi floor homes: one plan per floor.</p></details>
+  <details><summary>Who's behind Wander?</summary><p>It's built in Dundee by a civil engineering student who checks every walkthrough personally before it goes out. Small on purpose, so you always deal with the same person.</p></details>
 </div></section>
 
 <section class="request" id="request"><div class="wrap">
@@ -259,10 +259,11 @@
   rooms.forEach((r,i)=>{ const b=document.createElement('button'); b.className='pill'; b.textContent=r; b.onclick=()=>{ startDemo(i); document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); b.classList.add('on'); }; bar.insertBefore(b, bar.querySelector('.hint')); });
   function startDemo(room=0){ const f=document.getElementById('frame'); if(frameEl){ frameEl.contentWindow.postMessage({teleport:room},'*'); return; } frameEl=document.createElement('iframe'); frameEl.src=`view.html?p=perth-road-flat&embed=1&room=${room}`; frameEl.allow='pointer-lock'; frameEl.title='Wander live walkthrough'; f.appendChild(frameEl); f.classList.add('live'); }
   document.getElementById('start').onclick=()=>startDemo(0);
+  document.getElementById('dollBtn').onclick=()=>{ if(!frameEl){ startDemo(0); setTimeout(()=>frameEl.contentWindow.postMessage({dollhouse:true},'*'),2500); } else frameEl.contentWindow.postMessage({dollhouse:'toggle'},'*'); document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on')); };
 
   // work grid
-  const props=[["perth-road-flat","Perth Road, West End","2 bed Victorian tenement"],["broughty-ferry-semi","Broughty Ferry","3 bed semi-detached"],["city-quay-apartment","City Quay","1 bed waterfront apartment"],["newport-detached","Newport-on-Tay","4 bed detached"],["monifieth-bungalow","Monifieth","2 bed detached bungalow"],["barnhill-townhouse","Barnhill","New-build 3 bed townhouse"]];
-  document.getElementById('pfGrid').innerHTML=props.map(([k,t,s])=>`<a class="pf" href="view.html?p=${k}" target="_blank"><img class="render" src="portfolio/${k}-3d.jpg" alt="${t}" loading="lazy"><img class="plan" src="portfolio/${k}-plan.png" alt="Floor plan of ${t}" loading="lazy"><span class="hov">Floor plan</span><div class="cap"><div><b>${t}</b><span>${s}</span></div><i>Walk through ↗</i></div></a>`).join('');
+  const props=[["perth-road-flat","Perth Road, West End","2 bed Victorian tenement"],["broughty-ferry-semi","Broughty Ferry","3 bed semi detached"],["city-quay-apartment","City Quay","1 bed waterfront apartment"],["newport-detached","Newport on Tay","4 bed detached"],["monifieth-bungalow","Monifieth","2 bed detached bungalow"],["barnhill-townhouse","Barnhill","New build 3 bed townhouse"]];
+  document.getElementById('pfGrid').innerHTML=props.map(([k,t,s])=>`<a class="pf" href="view.html?p=${k}" target="_blank"><img class="plan" src="portfolio/${k}-plan.png" alt="Floor plan of ${t}" loading="lazy"><img class="render" src="portfolio/${k}-doll.jpg" alt="${t}" loading="lazy"><span class="hov">Floor plan</span><span class="mid">→</span><div class="cap"><div><b>${t}</b><span>${s}</span></div><i>Walk through ↗</i></div></a>`).join('');
 
   const subj=encodeURIComponent("Walkthrough request"), body=encodeURIComponent("Hi,\n\nListing link: \nAgency: \nPackage (Walkthrough £89 / Premium £199): \nDeadline (if any): \n\nThanks");
   document.getElementById('mailBtn').href=`mailto:${EMAIL}?subject=${subj}&body=${body}`; document.getElementById('mailTxt').href=`mailto:${EMAIL}`; document.getElementById('mailTxt').textContent=EMAIL;

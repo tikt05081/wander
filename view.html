@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Wander — walkthrough</title>
+<title>Wander walkthrough</title>
 <style>
   :root{--line:#2a2f3a;--muted:#9aa2b5}
   *{box-sizing:border-box} html,body{margin:0;height:100%;background:#0f1115;color:#eef0f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;overflow:hidden}
@@ -15,16 +15,22 @@
   #top *{pointer-events:auto}
   .logo{font-weight:700;font-size:16px;text-decoration:none;color:#fff} .logo span{color:#6c8cff}
   #title{font-size:14px;color:#dfe3ec} #title small{color:var(--muted);margin-left:8px}
-  #rooms{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;flex-wrap:wrap;max-width:60%}
-  #rooms button{background:rgba(15,17,21,.8);border:1px solid var(--line);color:#eef0f5;padding:7px 11px;border-radius:99px;font-size:12px;cursor:pointer}
-  #rooms button:hover{border-color:#6c8cff}
+  #rooms{position:absolute;right:14px;top:56px;bottom:84px;width:132px;display:flex;flex-direction:column;gap:8px;padding:8px;overflow:auto;background:rgba(15,17,21,.6);border:1px solid rgba(255,255,255,.1);border-radius:16px;backdrop-filter:blur(10px);scrollbar-width:none}
+  #rooms::-webkit-scrollbar{display:none}
+  #rooms button{position:relative;flex:0 0 auto;height:72px;border-radius:11px;border:2px solid transparent;background:#1b1e26 center/cover no-repeat;color:#fff;font-size:12px;font-weight:500;cursor:pointer;text-align:left;padding:0;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+  #rooms button span{position:absolute;left:8px;bottom:6px;right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #rooms button::before{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.6))}
+  #rooms button:hover{border-color:rgba(255,255,255,.45)} #rooms button.on{border-color:#6c8cff}
+  #bar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:4px;padding:6px;background:rgba(15,17,21,.75);border:1px solid rgba(255,255,255,.12);border-radius:999px;backdrop-filter:blur(10px)}
+  #bar button{width:42px;height:42px;border-radius:50%;border:0;background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center} #bar button:hover,#bar button.on{background:rgba(255,255,255,.12)} #bar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #tip{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);font-size:11px;color:var(--muted);letter-spacing:.04em;pointer-events:none}
   #stick{position:absolute;right:22px;bottom:22px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:none;touch-action:none}
   #stick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.55)}
   @media(pointer:coarse){#stick{display:block}}
   #brand{position:absolute;right:16px;top:14px;font-size:11px;color:var(--muted);letter-spacing:1px}
-  #map{position:absolute;left:12px;top:60px;width:170px;background:rgba(15,17,21,.75);border:1px solid var(--line);border-radius:12px;padding:8px;backdrop-filter:blur(6px)} #map canvas{width:100%;display:block;border-radius:6px} #map small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
-  #hud{position:absolute;right:16px;bottom:16px;font-size:12px;color:#dfe3ec;background:rgba(15,17,21,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(6px)} #hud b{color:#fff}
-  @media(max-width:640px){#map{width:120px;top:54px}}
+  #map{position:absolute;left:14px;bottom:18px;width:170px;background:rgba(15,17,21,.75);border:1px solid var(--line);border-radius:12px;padding:8px;backdrop-filter:blur(6px)} #map canvas{width:100%;display:block;border-radius:6px} #map small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+  #hud{display:none;position:absolute;right:16px;bottom:16px;font-size:12px;color:#dfe3ec;background:rgba(15,17,21,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(6px)} #hud b{color:#fff}
+  @media(max-width:640px){#map{width:110px;bottom:78px}#rooms{display:none}#stick{right:14px;bottom:78px}}
   #load{position:absolute;inset:0;display:grid;place-items:center;background:#0f1115;color:var(--muted);font-size:14px;z-index:5}
 </style>
 </head>
@@ -36,8 +42,15 @@
   <div id="rooms"></div>
   <div id="map"><small>You are here</small><canvas id="mapc" width="300" height="200"></canvas></div>
   <div id="hud"><b>W A S D</b> move · drag / mouse look · <b>Shift</b> run</div>
+  <div id="tip">W A S D to move · drag to look · Shift to run</div>
+  <div id="bar">
+    <button id="bPrev" title="Previous room"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button id="bDoll" title="Dollhouse view"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM4 7.5l8 4.5 8-4.5M12 12v9"/></svg></button>
+    <button id="bNext" title="Next room"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button id="bFull" title="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  </div>
   <div id="stick"><i></i></div>
-  <div id="overlay"><div class="card"><h2>Click to walk in</h2><p>W A S D to move · mouse to look · Shift to run · Esc to release</p><div class="t">On a phone: drag to look, use the joystick to move</div></div></div>
+  <div id="overlay"><div class="card"><h2>Click to walk in</h2><p>W A S D to move · mouse to look · Shift to run · Esc to release</p><div class="t">On a phone, drag to look and use the joystick to move</div></div></div>
   <div id="load">Building the house…</div>
 </div>
 <script type="module">
@@ -55,8 +68,17 @@ document.getElementById('title').innerHTML = `${project.title||'Walkthrough'}<sm
 let iw = project.iw, ih = project.ih;
 if (!iw) { const im = new Image(); im.src = project.planUrl || project.plan; await new Promise(r => im.onload = r); iw = im.width; ih = im.height; }
 const built = await v.load(project.rooms, { startRoom: +(q.get('room')||0), H: +project.wallH || 2.6, mpp: (+project.scale)/iw, iw, ih, quality: q.get('embed') ? 'lite' : 'full' });
-const rb = document.getElementById('rooms'); project.rooms.forEach((r,i) => { const b=document.createElement('button'); b.textContent=r.name; b.onclick=()=>v.teleport(built.roomCentres[i]); rb.appendChild(b); });
-addEventListener('message',e=>{ if(e.data&&typeof e.data.teleport==='number'){ v.teleport(built.roomCentres[e.data.teleport]); } });
+const rb = document.getElementById('rooms'); const roomBtns = project.rooms.map((r,i) => { const b=document.createElement('button'); b.innerHTML=`<span>${r.name}</span>`; b.onclick=()=>goRoom(i); rb.appendChild(b); return b; });
+let curRoom = +(q.get('room')||0);
+function goRoom(i, instant){ curRoom=(i+project.rooms.length)%project.rooms.length; instant ? v.teleport(built.roomCentres[curRoom]) : v.glideTo(built.roomCentres[curRoom]); document.getElementById('bDoll').classList.remove('on'); }
+addEventListener('message',e=>{ if(e.data&&typeof e.data.teleport==='number'){ goRoom(e.data.teleport); } if(e.data&&e.data.dollhouse!==undefined){ toggleDoll(e.data.dollhouse==='toggle'?undefined:e.data.dollhouse); } });
+function toggleDoll(on){ const d=v.dollhouse(on); document.getElementById('bDoll').classList.toggle('on',d); }
+document.getElementById('bPrev').onclick=()=>goRoom(curRoom-1);
+document.getElementById('bNext').onclick=()=>goRoom(curRoom+1);
+document.getElementById('bDoll').onclick=()=>toggleDoll();
+document.getElementById('bFull').onclick=()=>{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+// room thumbnails: quick offscreen snapshots from each room centre after first paint
+setTimeout(()=>{ const savedP=v.camera.position.clone(), savedR=v.camera.rotation.clone(); project.rooms.forEach((r,i)=>{ v.teleport(built.roomCentres[i]); v.camera.rotation.set(-0.05, (built.orient[i]||{back:0}).back*Math.PI/2 + Math.PI, 0); roomBtns[i].style.backgroundImage=`url(${v.thumb()})`; }); v.camera.position.copy(savedP); v.camera.rotation.copy(savedR); }, 400);
 document.getElementById('load').remove();
 // mini-map: rooms drawn to scale, camera dot + heading
 { const mc=document.getElementById('mapc'), g=mc.getContext('2d'); const rw=project.rooms.map(r=>r.pts.map(p=>({x:p.x*iw*(+project.scale/iw), z:p.y*ih*(+project.scale/iw)})));
@@ -67,8 +89,9 @@ document.getElementById('load').remove();
     rw.forEach((r,i)=>{ g.beginPath(); r.forEach((p,j)=>j?g.lineTo(X(p.x),Z(p.z)):g.moveTo(X(p.x),Z(p.z))); g.closePath(); g.fillStyle=i===cur?'rgba(108,140,255,.55)':'rgba(255,255,255,.14)'; g.fill(); g.strokeStyle='rgba(255,255,255,.7)'; g.lineWidth=1.5; g.stroke(); });
     const yaw=v.camera.rotation.y; const dx=-Math.sin(yaw), dz=-Math.cos(yaw); g.fillStyle='rgba(255,209,102,.35)'; g.beginPath(); g.moveTo(X(cp.x),Z(cp.z)); g.arc(X(cp.x),Z(cp.z),34,Math.atan2(dz,dx)-0.5,Math.atan2(dz,dx)+0.5); g.closePath(); g.fill();
     g.fillStyle='#ffd166'; g.beginPath(); g.arc(X(cp.x),Z(cp.z),5,0,7); g.fill(); g.strokeStyle='#1c1a17'; g.lineWidth=1.5; g.stroke();
-    const tl=document.getElementById('title'); if(cur>=0) tl.innerHTML=`${project.title||'Walkthrough'}<small>${project.rooms[cur].name}</small>`; };
+    const tl=document.getElementById('title'); if(cur>=0){ tl.innerHTML=`${project.title||'Walkthrough'}<small>${project.rooms[cur].name}</small>`; roomBtns.forEach((b,i)=>b.classList.toggle('on',i===cur)); } };
   draw(); }
+if (q.get('view')==='dollhouse') { toggleDoll(true); }
 if (q.get('still')) { v.pause(true); const img=document.createElement('img'); img.id='still'; img.src=v.screenshot(); document.body.appendChild(img); }
 if (q.get('embed')) overlay.querySelector('h2').textContent = 'Click to walk in';
 // touch joystick
